@@ -1,5 +1,25 @@
 [
   {
+    "path": "posts/2022-04-08-spotify/",
+    "title": "Análise das musicas no Spotify",
+    "description": "Post proposto em Workshop de Data Science na Prática do Curso-r.",
+    "author": [
+      {
+        "name": "Breno Pereira",
+        "url": "https://www.linkedin.com/in/brenosapereira/"
+      }
+    ],
+    "date": "2022-04-08",
+    "categories": [
+      "analise de dados",
+      "spotify"
+    ],
+    "contents": "\r\nSobre este trabalho\r\nEste documento analisa 32833 músicas\r\nextraídas do Spotify com os objetivos de:\r\nIdentificar o que torna uma música popular;\r\nIdentificar diferenças técnicas entre as músicas de diferentes\r\ngêneros musicais.\r\nNa seção 2 discutiremos o primeiro objetivo acima e na seção 3 vamos\r\nanalisar os gêneros musicais. Vamos utilizar como método principal de\r\ninvestigação análises descritivas tais como gráficos, tabelas e cálculo\r\nde sumários e, na última seção, vamos organizar as conclusões do\r\nestudo.\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2022-04-08T15:02:00-03:00",
+    "input_file": "spotify.knit.md"
+  },
+  {
     "path": "posts/2022-04-08-vacinacao-covid-19/",
     "title": " Vacinação Covid-19",
     "description": "Esse post surgiu a partir do interesse em saber como se encaminhou a vacinação contra a Covid-19 e da chance de utilizar, novamente, a plataforma da Base dos Dados. Nesta pesquisa, foram consideradas as pessoas vacinadas em Caruaru-PE.",

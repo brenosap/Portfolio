@@ -1,0 +1,22 @@
+---
+title: "Bem vindo ao meu Portfolio"
+description: |
+  Apresentação
+author:
+  - name: Breno Pereira 
+    url: https://www.linkedin.com/in/brenosapereira/
+    affiliation: PPGE - UFPB (Doutorando)
+date: 01-20-2022
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+  Olá, meu nome é **Breno**! Sou formado em Economia pela UFPE/CAA, possuo mestrado em Economia pelo PPGE/UFPB e atualmente (2022) estou cursando o doutorado em Economia também no PPGE/UFPB.
+
+
+  Aqui estarei disponibilizando algumas análises que surgiram a partir de curiosidades sobre diversos dados ou como forma de estudar mais sobre determimnados tópicos.
+
+    
+  Entre os assuntos abordados, análises das contas públicas, dados relacionados com o mercado de trabalho e sobre esportes. Nestas publicações busco abordar tanto análises gráficas e estatísticas, identificando correlações entre as variáveis observadas, como análises de classificação, regressão e previsões, a depender do tipo de informação disponível.
+

@@ -1,0 +1,36 @@
+[
+  {
+    "path": "posts/2022-04-08-analise-da-base-rais/",
+    "title": "Analise da base RAIS",
+    "description": "A short description of the post.",
+    "author": [
+      {
+        "name": "Breno Pereira",
+        "url": "https://www.linkedin.com/in/brenosapereira/"
+      }
+    ],
+    "date": "2022-04-08",
+    "categories": [],
+    "contents": "\r\nDistill is a publication format for scientific and technical writing,\r\nnative to the web.\r\nLearn more about using Distill at https://rstudio.github.io/distill.\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2022-04-08T13:22:36-03:00",
+    "input_file": "analise-da-base-rais.knit.md"
+  },
+  {
+    "path": "posts/welcome/",
+    "title": "Bem vindo ao meu Portfolio",
+    "description": "Apresentação",
+    "author": [
+      {
+        "name": "Breno Pereira",
+        "url": "https://www.linkedin.com/in/brenosapereira/"
+      }
+    ],
+    "date": "2022-01-20",
+    "categories": [],
+    "contents": "\r\nOlá, meu nome é Breno! Sou formado em Economia pela\r\nUFPE/CAA, possuo mestrado em Economia pelo PPGE/UFPB e atualmente (2022)\r\nestou cursando o doutorado em Economia também no PPGE/UFPB.\r\nAqui estarei disponibilizando algumas análises que surgiram a partir\r\nde curiosidades sobre diversos dados ou como forma de estudar mais sobre\r\ndetermimnados tópicos.\r\nEntre os assuntos abordados, análises das contas públicas, dados\r\nrelacionados com o mercado de trabalho e sobre esportes. Nestas\r\npublicações busco abordar tanto análises gráficas e estatísticas,\r\nidentificando correlações entre as variáveis observadas, como análises\r\nde classificação, regressão e previsões, a depender do tipo de\r\ninformação disponível.\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2022-04-08T13:17:07-03:00",
+    "input_file": "welcome.knit.md"
+  }
+]

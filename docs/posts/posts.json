@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/2022-04-08-vacinacao-covid-19/",
+    "title": " Vacinação Covid-19",
+    "description": "Esse post surgiu a partir do interesse em saber como se encaminhou a vacinação contra a Covid-19 e da chance de utilizar, novamente, a plataforma da Base dos Dados. Nesta pesquisa, foram consideradas as pessoas vacinadas em Caruaru-PE.",
+    "author": [
+      {
+        "name": "Breno Pereira",
+        "url": "https://www.linkedin.com/in/brenosapereira/"
+      }
+    ],
+    "date": "2022-02-15",
+    "categories": [],
+    "contents": "\r\nPacotes\r\nInicialmente são chamados os pacotes utilizados neste exemplo. O\r\npacote tidyverse aglomera diversos outros pacotes, como\r\no dplyr e o ggplot. O pacote DT possibilita a\r\nutilização de tabelas interativas, facilitando a visualização dos dados.\r\nO pacote Lubridate será utilizado para se trabalhar com\r\nas variáveis relacionadas à datas, já o pacote\r\nbasedosdados será de onde serão extraídos os dados de\r\nvacinação da COVID-19 utilizados neste exemplo.\r\n\r\n\r\nShow code\r\n\r\nknitr::opts_chunk$set(echo = TRUE,\r\n                      message = FALSE,\r\n                      warning = FALSE,\r\n                      error = FALSE)\r\n\r\nlibrary(tidyverse)\r\nlibrary(DT)\r\nlibrary(lubridate)\r\nlibrary(basedosdados)\r\nlibrary(hrbrthemes)\r\nlibrary(plotly)\r\nlibrary(viridis)\r\n\r\n\r\n\r\nDados - Vacinação Covid-19\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2022-04-08T13:46:10-03:00",
+    "input_file": "vacinacao-covid-19.knit.md"
+  },
+  {
     "path": "posts/2022-04-08-analise-da-base-rais/",
     "title": "Análise da base RAIS",
     "description": "Esse estudo teve como objetivo analisar os salários de profissionais ligados à Ciência dos Dados atráves da base da RAIS. Esse projeto foi feito a partir da Semana Data Science na Prática do Curso-R.",

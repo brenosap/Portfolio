@@ -1,0 +1,36 @@
+---
+title: " Vacinação Covid-19"
+description: |
+  Esse post surgiu a partir do interesse em saber como se encaminhou a vacinação contra a Covid-19 e da chance de utilizar, novamente, a plataforma da Base dos Dados. Nesta pesquisa, foram consideradas as pessoas vacinadas em Caruaru-PE.
+author:
+  - name: Breno Pereira
+    url: https://www.linkedin.com/in/brenosapereira/
+    affiliation: Doutorando - PPGE/UFPB
+date: 2022-02-15
+output:
+  distill::distill_article:
+    self_contained: false
+    code_folding: true
+---
+
+
+# Pacotes
+
+Inicialmente são chamados os pacotes utilizados neste exemplo. O pacote **tidyverse** aglomera diversos outros pacotes, como o dplyr e o ggplot. O pacote **DT** possibilita a utilização de tabelas interativas, facilitando a visualização dos dados. O pacote **Lubridate** será utilizado para se trabalhar com as variáveis relacionadas à datas, já o pacote **basedosdados** será de onde serão extraídos os dados de vacinação da COVID-19 utilizados neste exemplo.
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      error = FALSE)
+
+library(tidyverse)
+library(DT)
+library(lubridate)
+library(basedosdados)
+library(hrbrthemes)
+library(plotly)
+library(viridis)
+```
+
+# Dados - Vacinação Covid-19

@@ -264,7 +264,7 @@ spotify_tidy %>%
 
 Na análise de correlação entre essas variáveis, identifica-se que a acústica (*acousticness*) e energia (*energy*) das músicas possuem a menor associação negativa, enquanto que energia e volume (*loudness*) possuem a associação positiva mais próxima de 1. A partir desta primeira visão não é possível identificar uma associação relevante entre a popularidade da música e variáveis com acústica, dançabilidade, energia, instrumentalidade, vivacidade, volume, fala, ritmo e valência (medida que descreve a positividade musical transmitida por uma faixa).
 
-```{r, }
+```{r}
 
 spotify_tidy %>% 
     select(track_popularity, 
@@ -314,7 +314,7 @@ caracteristicas2 <- rbind(maxmin, caracteristicas) %>%
   as.data.frame() 
 ```
 
-```{r, fig.show="hold", out.width = "33%", preview = TRUE}
+```{r, fig.show="hold", out.width = "33%"}
 caracteristicas2 %>% 
   filter(playlist_genre %in% c("edm", "NA")) %>% 
   select(-playlist_genre) %>% 
@@ -382,7 +382,7 @@ O R&B apresenta altos níveis de dançabilidade, valência e o maior grau de ac�
 
 A variável volume (*loudness*) mede a intensidade geral das músicas em escala de decibéis (dB), variando, geralmente, entre -60 e 0, esta medida é útil para comparar o volume relativo das faixas. Assim, músicas do gênero Rock e R&B são mais intensas do que as dos demais genêros.
 
-```{r}
+```{r, preview = TRUE}
 spotify_tidy %>% 
   ggplot(aes(
     x = loudness,

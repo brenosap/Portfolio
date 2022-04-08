@@ -34,3 +34,350 @@ library(viridis)
 ```
 
 # Dados - Vacinação Covid-19
+
+
+Os dados de vacinação utilizados neste exemplo tratam das vacinas aplicadas no município de Caruaru - PE, que possui o seguinte código do IBGE: **2604106**. Para se obter estas informações devemos utilizar o seguinte comando:
+
+```{r include=FALSE}
+
+set_billing_id("temperatura-basedados")
+
+```
+
+
+```{r dados, message=FALSE, warning=FALSE}
+
+dados_vacinacao_car <- bdplyr("basedosdados.br_ms_vacinacao_covid19.microdados") %>%
+  filter(id_municipio_estabelecimento == "2604106") %>% 
+  bd_collect()
+
+```
+
+No dia **`r format(max(dados_vacinacao_car$data_aplicacao_vacina), '%d/%m/%Y')`**, com a vacinação ainda em andamento, existem 457.212 observações disponíveis da vacinação em Caruaru, referentes à 1ª e 2ª dose, bem como a dose única da vacina Janssen e as doses de reforço aplicadas, inicialmente, em imunossuprimidos, idosos e trabalhadores da saúde com mais de 6 meses após a aplicação da segunda dose.
+
+Abaixo uma representação das 5 primeiras observações e das variáveis disponíveis nesta base.
+
+```{r summary, paged.print=TRUE}
+
+kableExtra::kbl(head(dados_vacinacao_car, 5)) %>% 
+  kableExtra::kable_paper() %>% 
+  kableExtra::scroll_box(width = '100%')
+  
+```
+
+## Pré-processamento
+
+Antes de analisar os dados em si, se faz necessário a utilização de algumas técnicas de pré-processamento, com a finalidade de se padronizar todas as informações, evitando a análise errada de alguns dados. Entre as modificações, a criação de uma nova variável, criando faixas etárias dos indivíduos vacinados, o que possibilita a análise mais agrupada. Outra modificação foi a padronização de variáveis *strings* relacionadas com as doses das vacinas (por exemplo, há duas categorias relacionadas a primeira dose, são elas *1a Dose* e *1ª Dose*, modifica-se então para que estas informações sejam unificadas).
+
+```{r preprocessamento}
+faixa <- vector()
+for (i in 1:nrow(dados_vacinacao_car)){
+  if (dados_vacinacao_car$idade_paciente[i] < 12){
+    faixa[i] <- 'Menor que 12 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 18){
+    faixa[i] <- 'Entre 12 e 17 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 30){
+    faixa[i] <- 'Entre 18 e 29 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 40){
+    faixa[i] <- 'Entre 30 e 39 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 50){
+    faixa[i] <- 'Entre 40 e 49 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 60){
+    faixa[i] <- 'Entre 50 e 59 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 70){
+    faixa[i] <- 'Entre 60 e 69 anos'
+  } else if (dados_vacinacao_car$idade_paciente[i] < 80){
+    faixa[i] <- 'Entre 70 e 79 anos'
+  } else {
+    faixa[i] <- 'Acima de 80 anos'
+  }
+}
+
+dados_vacinacao_car$faixa_etaria <- faixa
+dados_vacinacao_car <- dados_vacinacao_car %>% 
+  mutate(dose_vacina = ifelse(dose_vacina == 'Dose', 'Dose Única', dose_vacina),
+         dose_vacina = ifelse(dose_vacina == 'Dose Adicional', 'Reforço', dose_vacina))
+```
+
+## Análise da Vacinação em Caruaru - PE
+
+Após o pré-processemanto destas informações, podemos dar início a análise da vacinação em Caruaru, começando pelo fluxo de vacinação, iniciado em 19/01/2021 e que vacinou ao todo, considerando-se a primeira e segunda dose, além das vacinas de dose única e as doses de reforço. Para a criação do gráfico foi utilizado o pacote **ggplot**, que, como dito anteriormente, faz parte do **tidyverse**.
+
+```{r fluxo, message=FALSE, warning=FALSE}
+
+fluxo <- dados_vacinacao_car %>% 
+  group_by(data_aplicacao_vacina) %>% 
+  count()
+
+#sum(fluxo$n)
+
+g1 <- ggplot(fluxo, aes(x= data_aplicacao_vacina, y = n, group = 1,
+                        text = paste('Data da aplicação:',
+                                     data_aplicacao_vacina,
+                                     '\nQtd. de vacinados:',
+                                     n)))+
+  geom_line(color = 'steelblue')+
+  geom_area(alpha = 0.4, fill = 'steelblue')+
+  geom_point(aes(x = as.Date('2021-08-29'), y = 7072),
+                 color = 'steelblue')+
+  theme_ipsum()+
+  scale_x_date(name = '',
+               date_breaks = '2 months',
+               date_labels = '%d/%b')+
+  scale_y_continuous(name = '', 
+                     limits = c(0, 9000, 1500))+
+  annotate('text', x = as.Date('2021-08-29'), y = 7850,
+           label = '7.072 pessoas\n vacinadas')
+
+g1 <- ggplotly(g1, tooltip = 'text') %>% 
+  layout(title = list(text = paste0('Vacinação em Caruaru - PE',
+                                    '<br>',
+                                    '<sup>',
+                                    'Aplicações diárias. Ao todo, foram aplicadas ',
+                                    format(nrow(dados_vacinacao_car),
+                                           big.mark = '.'),
+                                    ' doses.',
+                                    '</sup>')),
+         annotations = list(x = 1, y = -0.4,
+              text = "<i>Dados: Ministério da Saúde obtidos com basedosdados.org</i>", 
+              showarrow = F, xref='paper', yref='paper', 
+              xanchor='right', yanchor='auto', xshift=0, yshift=0,
+              font=list(size=15)))
+g1
+```
+
+Nota-se que o dia com maior número de aplicações de vacinas aconteceu em 29/08/2021, final de semana em que houve a liberação na cidade para a vacinação de pessoas com 20 anos ou mais.
+
+A partir do gráfico abaixo identifica-se que a partir de julho ouve um aumento significante nas aplicações das segundas doses (e aplicação das doses únicas da Janssen), concluindo-se o esquema vacinal de uma maior parcela da população caruaruense. Nas últimas semanas houve uma grande redução entre o total de pessoas que totmou a 1ª dose da vacina e as pessoas que estão completamente vacinadas.
+
+```{r message=FALSE, warning=FALSE, out.height='90%', out.width='90%', paged.print=TRUE}
+
+imunizados <- dados_vacinacao_car %>% 
+  mutate(
+    situacao = ifelse(dose_vacina == 'Dose Adicional', 'Reforço', dose_vacina)
+         ) %>% 
+  drop_na(situacao) %>% 
+  group_by(situacao, data_aplicacao_vacina) %>% 
+  count() %>% 
+  dplyr::group_by(situacao) %>% 
+  arrange(data_aplicacao_vacina) %>% 
+  mutate(cumulative = cumsum(n))
+
+g5 <- ggplot(imunizados, aes(x = data_aplicacao_vacina, y = cumulative,
+                    color = situacao, group = 1,
+                    text = paste('Data da aplicação:', data_aplicacao_vacina,
+                                 '\nQtd. acumulada:', cumulative,
+                                 '\nSituação:', situacao)))+
+  geom_line(size = 1.2)+
+  theme_ipsum()+
+  scale_y_continuous(limits = c(0,400000), breaks = seq(0,400000, 50000))+
+  scale_x_date(date_breaks = '2 months', date_labels = '%b')+
+  labs(x='', y='',
+       title = 'População imunizada')+
+  theme(panel.grid.minor.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = 'top', 
+        legend.title = element_blank())
+
+ggplotly(g5, tooltip = 'text') %>% 
+  layout(legend = list(orientation = 'h', x = 0.3, y =1.1),
+         annotations = list(x = 1, y = -0.4,
+              text = "<i>Dados: Ministério da Saúde obtidos com basedosdados.org</i>", 
+              showarrow = F, xref='paper', yref='paper', 
+              xanchor='right', yanchor='auto', xshift=0, yshift=0,
+              font=list(size=15)))
+```
+
+De forma geral, Caruaru já aplicou (até a data de `r format(max(dados_vacinacao_car$data_aplicacao_vacina), "%d/%m/%y")`) `r scales::number(nrow(dados_vacinacao_car), big.mark = ".")` doses de vacina no combate ao coronavírus, sendo que aproximadamente 540 mil pessoas já foram totalmente imunizadas (1ª dose + 2ª dose ou dose única - Janssen). Destas, mais de 57 mil pessoas já tomaram a dose de reforço, que teve seu início nos grupos de pessoas imunossuprimidas (com mais de 28 dias após a última dose), em idosos com mais de 60 anos e profissionais de saúde, nestes dois últimos grupos a dose extra deve ser administrada 6 meses depois de completar o esquema vacinal inicial.
+
+```{r dose_aplicada, message=FALSE, warning=FALSE}
+dose_aplicada <- dados_vacinacao_car %>% 
+  count(dose_vacina)
+
+dose_aplicada %>% 
+  ggplot(aes(x = reorder(dose_vacina, n), y = n))+
+  geom_col(fill = 'steelblue', alpha = 0.9)+
+  geom_label(aes(label = n),
+            hjust = ifelse(dose_aplicada$n > 260000, 1.1, -0.1))+
+  coord_flip()+
+  theme_ipsum()+
+  scale_y_continuous(breaks = seq(0,320000, 50000),
+                     labels = paste(seq(0,300,50), 'k', sep=''))+
+  labs(x = 'Tipo de dose', y = 'Quantidade', 
+       title = 'Doses Aplicadas',
+       subtitle = 'em Caruaru - PE',
+       caption = 'Dados: Ministério da Saúde obtidos com basedosdados.org')+
+  theme(panel.grid.major.y = element_blank())
+
+```
+
+Agora, o gráfico contruído aponta a quantidade de doses aplicadas segundo o tipo da dose (primeira, segunda, dose única ou de reforço) e a faixa etária das pessoas vacinadas no município.
+
+```{r vacinacao_idade_dose}
+vacinacao_idade <- dados_vacinacao_car %>%
+  group_by(dose_vacina) %>% 
+  count(faixa_etaria) %>% 
+  mutate(faixa_etaria = factor(faixa_etaria,
+                               levels = c('Menor que 12 anos',
+                                          'Entre 12 e 17 anos',
+                                          'Entre 18 e 29 anos',
+                                          'Entre 30 e 39 anos',
+                                          'Entre 40 e 49 anos',
+                                          'Entre 50 e 59 anos',
+                                          'Entre 60 e 69 anos',
+                                          'Entre 70 e 79 anos',
+                                          'Acima de 80 anos')))
+
+vacinacao_idade %>% 
+  ggplot(aes(faixa_etaria, n, fill = dose_vacina))+
+  geom_col(alpha = 0.7, position = 'dodge')+
+  theme_minimal()+
+  scale_y_continuous(breaks = seq(0, 90000, 10000))+
+  scale_x_discrete(labels = c('Menor que\n12 anos',
+                              'Entre 12\ne 17 anos',
+                              'Entre 18\ne 29 anos',
+                              'Entre 30\ne 39 anos',
+                              'Entre 40\ne 49 anos',
+                              'Entre 50\ne 59 anos',
+                              'Entre 60\ne 69 anos',
+                              'Entre 70\ne 79 anos',
+                              'Acima de\n80 anos'))+
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        legend.title = element_blank(),
+        legend.position = 'bottom')+
+  labs(caption = 'Dados: Ministério da Saúde obtidos com basedosdados.org',
+       x = '', y='',
+       title = 'Vacinação em Caruaru-PE', 
+       subtitle = 'Por idade e tipo de dose')
+```
+
+Deste gráfico acima identifica-se que pessoas acima de 50 anos já estão, em sua grande maioria, completamente vacinadas (1ª mais 2ª dose, ou os casos de pessoas que tomaram a vacina de dose única). Adultos na faixa etária dos 40 aos 49 anos foram os que mais tomaram vacina da Janssen (dose única), proveniente, em grande parte, de lote doado pelos EUA.
+
+No gráfico abaixo, procura-se demonstrar como se deu o fluxo de vacinação levando em consideração as fabricantes das vacinas.
+
+```{r tipo}
+vacinas_tipo <- dados_vacinacao_car %>% 
+  mutate(week = week(data_aplicacao_vacina)) %>% 
+  group_by(week) %>% 
+  count(codigo_vacina) %>% 
+  mutate(codigo_vacina = ifelse(codigo_vacina == 85, 'Covishield', codigo_vacina),
+         codigo_vacina = ifelse(codigo_vacina == 86, 'Coronavac', codigo_vacina),
+         codigo_vacina = ifelse(codigo_vacina == 87, 'Pfizer', codigo_vacina),
+         codigo_vacina = ifelse(codigo_vacina == 88, 'Janssen', codigo_vacina),
+         codigo_vacina = ifelse(codigo_vacina == 89, 'AstraZeneca', codigo_vacina))
+
+g2 <- ggplot(vacinas_tipo, aes(x= week, y = n,
+                         fill = codigo_vacina, group = codigo_vacina,
+                         text = paste('Semana:', week,
+                                      '\nQuantidade:', n,
+                                      '\nFabricante:', codigo_vacina)))+
+  geom_area()+
+  scale_fill_viridis(discrete = TRUE) +
+  theme_ipsum()+
+  theme(legend.position="none",
+        panel.spacing = unit(0.1, "lines"),
+        strip.text.x = element_text(size = 8))+
+  theme(legend.position = 'none')+
+  labs(y = 'Doses aplicadas', x = 'Semana de aplicação',
+       title = 'Tipos de vacinas aplicadas ao longo dos meses',
+       caption = 'Dados: Ministério da Saúde obtidos com basedosdados.org')+
+  
+  facet_wrap(~codigo_vacina)
+
+ggplotly(g2, tooltip = 'text') %>% 
+  layout(annotations = list(
+    x = 1, y = -0.4,
+    text = "<i>Dados: Ministério da Saúde obtidos com basedosdados.org</i>",
+    showarrow = F, xref='paper', yref='paper', 
+    xanchor='right', yanchor='auto', xshift=0,
+    yshift=0, font=list(size=12)
+    ))
+```
+
+Identifica-se que a vacinação teve início na 3ª semana de 2021, em que, a maior parte das vacinas aplicadas em Caruaru eram a Coronavac e, em menor parcela, a AstraZeneca - Covishield (importadas da Índia). A partir de Abril (15ª semana do ano) houve uma maior oferta de vacinas, com o início da aplicação de vacinas da Pfizer e da Janssen (esta última, dose única). Nas últimas semanas, nota-se uma predominância de aplicações da vacina Pfizer e da Coronavac.
+
+Entre as pessoas que tomaram a 1ª dose da vacina em Caruaru, porém, após o intervalo mínimo necessário para aplicação da 2ª dose, não retornaram para completar o esquema vacinal, o número atinge, aproximadamente 85 mil pessoas. Sendo observado que o maior grupo é o de pessoas com o até 20 dias passados do intervalo mínimo que precisa ser respeitado, a depender do tipo de vacina que foi aplicada.
+
+```{r atrasados, fig.align='center', out.height='90%', out.width='90%', paged.print=TRUE}
+
+dose_1 <- dados_vacinacao_car %>% 
+  filter(dose_vacina == '1ª Dose')
+
+dose_2 <- dados_vacinacao_car %>% 
+  filter(dose_vacina == '2ª Dose')
+
+falta_2adose <- anti_join(dose_1, dose_2, by = 'id_paciente')
+falta_2adose <- falta_2adose %>% 
+  mutate(atraso = as.numeric(Sys.Date() - data_aplicacao_vacina))
+
+conferencia_estados <- falta_2adose
+estados <- c('PB', 'AL', 'SE', 'PE', 'CE', 'BA')
+for (i in estados){
+  query <- paste0("SELECT id_paciente FROM `basedosdados.br_ms_vacinacao_covid19.microdados_vacinacao` where sigla_uf = '", i, "' and dose = '2ª Dose' or sigla_uf = '", i, "' and dose = '2a Dose'")
+  pesquisa <- read_sql(query)
+  conferencia_estados <- anti_join(conferencia_estados, pesquisa,
+                                   by = 'id_paciente')
+  nrow(conferencia_estados)
+  rm(pesquisa)
+}
+
+intervalo_min_vacina <- vector()
+for (i in 1:nrow(conferencia_estados)){
+  if (conferencia_estados$codigo_vacina[i] == 85){
+    intervalo_min_vacina[i] <- 56
+  } else if (conferencia_estados$codigo_vacina[i] == 86){
+    intervalo_min_vacina[i] <- 25
+  } else if (conferencia_estados$codigo_vacina[i] == 87){
+    intervalo_min_vacina[i] <- 21
+  } else {
+    intervalo_min_vacina[i] <- 56
+  }
+}
+
+faltantes <- conferencia_estados %>% 
+  mutate(intervalo_min_vacina = intervalo_min_vacina,
+         dias_passados = atraso - intervalo_min_vacina)
+
+atrasados <- faltantes %>% 
+  filter(dias_passados > 0)
+
+vetor <- vector()
+for (i in 1:nrow(atrasados)){
+  if (atrasados$dias_passados[i] <= 90){
+    vetor[i] <- 'Até 90 dias'
+  } else if (atrasados$dias_passados[i] <= 120){
+    vetor[i] <- '91 a 120 dias'
+  } else {
+    vetor[i] <- 'Mais de 120 dias'
+  }
+}
+
+g3 <- atrasados %>% 
+  mutate(faixa_dias = factor(vetor, levels = c('Até 90 dias',
+                                               '91 a 120 dias',
+                                               'Mais de 120 dias'))) %>% 
+  count(faixa_dias) %>% 
+  ggplot(aes(faixa_dias, n,
+             text = paste('Dias atrasados', faixa_dias,
+                          '\nTotal de pessoas:', format(n, big.mark='.'))))+
+  geom_col(fill = 'steelblue')+
+  theme_ipsum()+
+  labs(x = '', y = 'Pessoas')+
+  scale_y_continuous(limits = c(0, 45000), breaks = seq(0, 45000, 7500))+
+  theme(panel.grid.major.x = element_blank())
+
+ggplotly(g3, tooltip = 'text') %>% 
+  layout(title = list(text = paste0('Pessoas com vacinas atrasadas',
+                                    '<br>',
+                                    '<sup>',
+                                    'em Caruaru - PE (total: ', format(nrow(atrasados), big.mark='.'),' - dados até ', format(max(dados_vacinacao_car$data_aplicacao_vacina), '%d/%m/%Y'),')',
+                                    '</sup>')),
+         annotations = list(x = 1, y = -0.2,
+                            text = "<i>Dados: Ministério da Saúde obtidos com basedosdados.org</i>", 
+                            showarrow = F, xref='paper', yref='paper', 
+                            xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                            font=list(size=15)))
+```
+
+Isto pode estar ocorrendo devido as recentes mudanças nos intervalos mínimos de algumas vacinas. Inicialmente, eram necessários 45 dias de intervalo entre a primeira e a segunda dose da vacina Coronavac e 90 dias para a vacina da Pfizer, entretanto, no mês de outubro o município de Caruaru diminui esses intervalos para 28 e 21 dias, respectivamente. Como nos cartões de vacina estavam escritas as datas para que as pessoas retornassem ao centro de vacinação, isto pode estar influenciando no atraso da vacinação de alguns grupos. Este número de atrasados representa `r round((nrow(atrasados)/nrow(dose_1))*100, 2)`% das pessoas que tomaram a primeira dose no município de Caruaru e não se reapresentaram para tomar a segunda dose em Caruaru, ou em qualquer município de Pernambuco, Ceará, Paraíba, Alagoas, Sergipe e Bahia (a procura só foi feita nos estados que fazem fronteira com Pernambuco e que, exatamente por isso, possuem uma maior movimentação da população em território caruaruense/pernambucano, bem como a ida de caruaruenses para esses estados).

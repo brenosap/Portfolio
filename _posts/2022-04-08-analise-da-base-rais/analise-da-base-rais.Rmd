@@ -1,14 +1,16 @@
 ---
-title: "Analise da base RAIS"
+title: "Análise da base RAIS"
 description: |
-  A short description of the post.
+  Esse estudo teve como objetivo analisar os salários de profissionais ligados à Ciência dos Dados atráves da base da RAIS. Esse projeto foi feito a partir da Semana Data Science na Prática do Curso-R.
 author:
   - name: Breno Pereira
     url: https://www.linkedin.com/in/brenosapereira/
-date: 2022-04-08
+    affiliation: Doutorando - PPGE/UFPB
+date: 2022-01-31
 output:
   distill::distill_article:
     self_contained: false
+    code_folding: true
 ---
 
 

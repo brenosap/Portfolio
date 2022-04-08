@@ -1,19 +1,19 @@
 [
   {
     "path": "posts/2022-04-08-analise-da-base-rais/",
-    "title": "Analise da base RAIS",
-    "description": "A short description of the post.",
+    "title": "Análise da base RAIS",
+    "description": "Esse estudo teve como objetivo analisar os salários de profissionais ligados à Ciência dos Dados atráves da base da RAIS. Esse projeto foi feito a partir da Semana Data Science na Prática do Curso-R.",
     "author": [
       {
         "name": "Breno Pereira",
         "url": "https://www.linkedin.com/in/brenosapereira/"
       }
     ],
-    "date": "2022-04-08",
+    "date": "2022-01-31",
     "categories": [],
     "contents": "\r\nDistill is a publication format for scientific and technical writing,\r\nnative to the web.\r\nLearn more about using Distill at https://rstudio.github.io/distill.\r\n\r\n\r\n\r\n",
     "preview": {},
-    "last_modified": "2022-04-08T13:22:36-03:00",
+    "last_modified": "2022-04-08T13:25:24-03:00",
     "input_file": "analise-da-base-rais.knit.md"
   },
   {

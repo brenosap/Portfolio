@@ -314,7 +314,7 @@ caracteristicas2 <- rbind(maxmin, caracteristicas) %>%
   as.data.frame() 
 ```
 
-```{r, fig.show="hold", out.width = "33%"}
+```{r, fig.show="hold", out.width = "33%", preview = TRUE}
 caracteristicas2 %>% 
   filter(playlist_genre %in% c("edm", "NA")) %>% 
   select(-playlist_genre) %>% 
@@ -382,7 +382,7 @@ O R&B apresenta altos níveis de dançabilidade, valência e o maior grau de ac�
 
 A variável volume (*loudness*) mede a intensidade geral das músicas em escala de decibéis (dB), variando, geralmente, entre -60 e 0, esta medida é útil para comparar o volume relativo das faixas. Assim, músicas do gênero Rock e R&B são mais intensas do que as dos demais genêros.
 
-```{r, preview = TRUE}
+```{r}
 spotify_tidy %>% 
   ggplot(aes(
     x = loudness,

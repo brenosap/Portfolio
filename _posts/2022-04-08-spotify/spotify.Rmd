@@ -1,5 +1,5 @@
 ---
-title: "Análise das musicas no Spotify"
+title: "Análise dos gêneros musicais no Spotify"
 categories: 
   - analise de dados
   - spotify
@@ -8,13 +8,12 @@ description: |
 author:
   - name: Breno Pereira
     url: https://www.linkedin.com/in/brenosapereira/
-    affiliation: Doutorando - PPGE/UFPB
-date: 2022-04-08
+date: 2022-04-07
 output:
   distill::distill_article:
     self_contained: false
-    code_folding: true
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -38,12 +37,8 @@ spotify_tidy <- spotify_data %>%
            nchar(track_album_release_date) == 10 ~ as.Date(track_album_release_date),
            nchar(track_album_release_date) == 10 ~ lubridate::ym(track_album_release_date),
            TRUE ~ as.Date(paste0(track_album_release_date, '-01-01'))
-           ),
-         percentual_de_score_menor_0 = mean(track_popularity <= 10),
-         media_score_sem_0 = mean(track_popularity[track_popularity > 10])
+           )
          )
-  
-#radiant::radiant()
 ```
 
 # Sobre este trabalho
@@ -54,3 +49,402 @@ Este documento analisa `r nrow(spotify_data)` [músicas extraídas do Spotify](h
 2. Identificar diferenças técnicas entre as músicas de diferentes gêneros musicais.
 
 Na seção 2 discutiremos o primeiro objetivo acima e na seção 3 vamos analisar os gêneros musicais. Vamos utilizar como método principal de investigação análises descritivas tais como gráficos, tabelas e cálculo de sumários e, na última seção, vamos organizar as conclusões do estudo.
+
+## Dados analisados
+
+Dicionário das variáveis:
+
+ - **track_id**: código único de identificação da música;
+ - **track_name**: título da faixa;
+ - **track_artist**: artista que canta a música;
+ - **track_popularity**: índice de popularidade, admitindo valores entre 0 e 100, com 100 sendo o melhor resultado obtido por uma música;
+ - **track_album_id**: código único de identificação do álbum em que a música foi gravada;
+ - **track_album_name**: nome do álbum em que a música foi gravada;
+ - **track_album_release_date**: data em que o álbum foi lançado;
+ - **playlist_name**: nome da _playlist_ em que está a música;
+ - **playlist_id**: código único de identificação da _playlist_;
+ - **playlist_genre**: gênero da _playlist_;
+ - **playlist_subgenre**: subgênero da _playlist_;
+ - **danceability**: valor entre 0 e 1 que descreve quão adequada uma faixa é para dançar, com base em uma combinação de elementos musicais;
+ - **energy**: valor entre 0 e 1 que representa uma medida perceptiva de intensidade. Normalmente as faixas energéticas parecem rápidas, altas e barulhentas;
+ - **key**: o tom estimado da música;
+ - **loudness**: O volume geral de uma faixa em decibéid (dB), representa a qualidade de um som;
+ - **mode**: modo musical, indica a modalidade (maior ou menor) de uma música baseado na característica da terceira nota desta;
+ - **speechiness**: detecta a presença de palavras faladas em uma faixa, quanto mais exclusivamente falada a gravação, mais próximo de 1;
+ - **acousticness**: medida entre 0 e 1, em que representa alta confiança de que a música é acústica;
+ - **instrumentalness**: prevê se uma faixa não contém vocais, quanto mais próximo de 1, maior a probabilidade de a faixa não ter conteúdo vocal;
+ - **liveness**: detecta a presença de uma audiência na gravação, com valores mais próximos de 1 representando maior probabilidade de que a música tenha sido executada ao vivo;
+ - **valence**: medida de 0 a 1, descreve a positividade musical transmitida. Uma música com alta valência soa mais positiva (feliz, alegre, eufórica), enquanto faixa com baixa valência soam mais negativas (trsite, deprimida, irritada);
+ - **tempo**: representa a velocidade ou ritmo de uma música, medida em batidas por minuto (BPM);
+ - **duration_ms**: duração da canção em milisegundos.
+
+```{r}
+
+spotify_data %>% 
+  head(5) %>% 
+  kable() %>% 
+  scroll_box(width = "1000px", height = "400px") 
+```
+
+# O que torna uma música popular?
+
+Nesta seção vamos analisar quais variáveis da nossa base ajudam a discrimar as múscias muito populares das pouco populares. Antes disso, entretanto, vamos analisar o padrão geral de variação do score de popularidade.
+
+Na tabela abaixo encontram-se algumas estatísticas que nos ajudam a qualificar o padrão de variação do score de popularidade.
+
+```{r}
+
+spotify_data %>% 
+  summarise(
+    `Média do Score` = mean(track_popularity),
+    `Mediana do Score` = median(track_popularity),
+    `Desvio Padrão do Score` = sd(track_popularity),
+    `Coeficiente de Variação` = `Desvio Padrão do Score`/`Média do Score`
+  ) %>% 
+  pivot_longer(everything(), names_to = 'Indicador', 
+               values_to = 'Valor do indicador') %>% 
+  mutate(
+    `Valor do indicador` = format(round(`Valor do indicador`, 2), 
+                                  big.mark = '.', decimal.mark = ',')
+  ) %>% 
+  kable() %>% 
+  kable_minimal()
+```
+
+Já no gráfico abaixo verifica-se que embroa a média e a mediana do score fiquem em torno de 45 pontos, existe uma concentração ao redor do 0 também.
+
+```{r}
+
+spotify_data %>% 
+  ggplot(aes(x = track_popularity)) +
+  geom_histogram(fill = 'royalblue3', alpha = 0.6)+
+  labs(x = 'Faixa de Score de Popularidade',
+       y = 'Contagem de músicas',
+       title = 'Histograma de contagem da variável\nScore de Popularidade')+
+  theme_minimal()
+```
+
+Agora que qualificamos o perfil de variação da variável Score de popularidade, vamos partir para uma análise da relação desta variável com as demais da base. Vamos começar identificando ou não uma relação da variável Score com o ano de lançamento da múscia.
+
+No gráfico abaixo nota-se uma tendência de queda na popularidade média das músicas ao longo do tempo, mas com uma retomada íngrime a partir de 2010.
+
+```{r}
+
+media_score_ano <- spotify_tidy %>%
+  filter(!is.na(year)) %>% 
+  group_by(year) %>% 
+  summarise(
+    media_score = mean(track_popularity),
+    mediana_score = median(track_popularity),
+    percentual_de_score_menor_que_10 = mean(track_popularity <= 10),
+    media_score_maior_que_10 = mean(track_popularity[track_popularity > 10])
+  )
+
+media_score_ano_genero <- spotify_tidy %>%
+  group_by(year) %>% 
+  summarise(
+    media_score = mean(track_popularity)
+  )
+
+media_score_ano_genero %>% 
+  ggplot(aes(x = year, y = media_score))+
+  geom_point()+
+  labs(x='Ano de lançamento da música', 
+       y = 'Popularidade média das músicas',
+       title = 'Popularidade das músicas ao longo do tempo')+
+  theme_minimal()
+  
+```
+
+Entretanto, esse comportamento aparentemente é causado pelo percentual de músicas na concentração inferior da distribuição do score de popularidade, que identificamos antes neste texto. O gráfico abaixo ilustra que o percentual de músicas com popularidade inferior a 10 subiu de cerca de 10% em 1960 a cerca de 40% em 2010.
+
+```{r}
+media_score_ano %>% 
+  ggplot(aes(x = year, y = percentual_de_score_menor_que_10))+
+  geom_point()+
+  labs(x='Ano de lançamento da música', 
+       y = '% de múscias com score de popularidade inferior a 10',
+       title = 'Percentual de músicas com score de popularidade inferior a 10 ao longo do tempo')+
+  theme_minimal()
+```
+
+
+Tendo identificado que músicas lançadas em diferentes anos tem scores de popularidade bem distintos, vamos partir para a análise da variável gênero musical. Na tabela abaixo podemos comparar algumas estatísticas da popularidade associada a cada gênero. Com exceção do gênero Eletric Dance Music (EDM), o gênero musical não parece ser um fator determinante para a popularidade da música.
+
+```{r}
+funcao_que_arruma_numero <- scales::label_number(
+  accuracy = 0.01,
+  big.mark = '.', 
+  decimal.mark = ',')
+
+spotify_data %>% 
+  group_by(playlist_genre) %>% 
+  summarise(
+    `Média do Score` = mean(track_popularity),
+    `Mediana do Score` = median(track_popularity),
+    `Desvio Padrão do Score` = sd(track_popularity),
+    `Coeficiente de Variação` = `Desvio Padrão do Score`/`Média do Score`
+  ) %>% 
+  mutate_if(is.numeric, funcao_que_arruma_numero) %>% 
+  mutate(playlist_genre = str_to_upper(playlist_genre)) %>% 
+  rename(
+    `Gênero Musical` = playlist_genre
+  ) %>% 
+  kable() %>% 
+  kable_minimal()
+
+```
+
+
+A próxima variável que analisaremos será a variável artista. Entretanto, na base existem `r length(unique(spotify_data$track_artist))` pessoas. Por isso para conseguir avaliar o impacto do artista na popularidade vamos analisar a produtividade de cada artista em números de músicas.
+
+```{r}
+perfil_artista <- spotify_tidy %>% 
+  group_by(track_artist) %>% 
+  summarise(
+    pop_maxima = max(track_popularity),
+    pop_media = mean(track_popularity),
+    nro_musicas = n(),
+    idade = as.numeric(
+      Sys.Date() - min(year2))/365
+    ) 
+
+perfil_artista %>% 
+  filter(nro_musicas > 5) %>% 
+  ggplot(aes(x = nro_musicas))+
+  geom_histogram(fill = 'royalblue3', alpha = 0.6)+
+  labs(
+    x = 'Número de músicas', 
+    y = 'Número de artistas',
+    title = 'Histograma do número de músicas compostas por artista')+
+  scale_x_log10()+
+  theme_minimal()
+```
+
+Nota-se que a grande maioria dos artistas são autores de pouqíssimas músicas. 6 artistas ou grupos musicais são autores de 100 ou mais canções na base de dados. 
+Do gráfico abaixo identicamos que quanto maior o número de músicas escritas, há uma tendência à convergência da popularidade média do artista (ou banda) próxima a 50. Martin Garrix e Queen são os primeiros na lista de maiores compositores e possuem média de popularidade de 47,2 e 43, respectivamente.
+
+```{r}
+perfil_artista %>% 
+  ggplot(aes(x = nro_musicas, y = pop_media))+
+  geom_point()+
+  labs(
+    x = 'Número de músicas do artista',
+    y = 'Popularidade média das músicas',
+    title = 'Popularidade média por número de músicas compostas'
+  )+
+  theme_minimal()+
+  annotate(
+    'text',
+    x = max(perfil_artista$nro_musicas),
+    y = 60,
+    label = 'Martin\nGarrix') +
+  annotate(
+    'text',
+    x = sort(perfil_artista$nro_musicas)[10692],
+    y = 37,
+    label = 'Queen')
+```
+
+Ao observar de maneira mais geral, as variáveis abaixo não apresentam nenhum padrão facilmente observável, entretanto, na segunda seção desta análise serão estudadas se essas mesmas variáveis possuem algum tipo de padrão identificável a depender do gênero musical.
+
+```{r}
+
+spotify_tidy %>% 
+  select(track_popularity, acousticness, danceability, energy, 
+         instrumentalness, liveness, loudness, speechiness, tempo, valence) %>% 
+  pivot_longer(!track_popularity,
+               names_to = 'variavel', 
+               values_to = 'grandeza') %>% 
+  ggplot(aes(x = grandeza, y = track_popularity))+
+  geom_point()+
+  theme_bw()+
+  facet_wrap(vars(variavel), scales = 'free_x', nrow = 3)
+```
+
+Na análise de correlação entre essas variáveis, identifica-se que a acústica (*acousticness*) e energia (*energy*) das músicas possuem a menor associação negativa, enquanto que energia e volume (*loudness*) possuem a associação positiva mais próxima de 1. A partir desta primeira visão não é possível identificar uma associação relevante entre a popularidade da música e variáveis com acústica, dançabilidade, energia, instrumentalidade, vivacidade, volume, fala, ritmo e valência (medida que descreve a positividade musical transmitida por uma faixa).
+
+```{r, }
+
+spotify_tidy %>% 
+    select(track_popularity, 
+           acousticness, danceability, energy, 
+           instrumentalness, liveness, loudness,
+           speechiness, tempo, valence) %>% 
+  cor() %>% 
+  corrplot::corrplot(
+    title = 'Gráfico de correlação entre os atributos técnicos das músicas',
+    type = 'lower',
+    diag = F)
+
+```
+
+# Gêneros musicais e atributos técnicos das músicas
+
+Como forma de aumentar o entendimento a cerca de cada gênero musical e suas especificidades, vamos analisar este conjunto de variáveis separadamente. Para tanto, foram calculadas as médias das variáveis apresentadas abaixo por cada estilo musical, de forma que os gráficos abaixo apresentam as caracterísicas de forma relativa às médias máximas observadas.
+
+
+```{r}
+caracteristicas <- spotify_tidy %>% 
+  select(playlist_genre, acousticness,
+         danceability, energy, instrumentalness,
+         liveness, speechiness,
+         tempo, valence) %>% 
+  group_by(playlist_genre) %>%
+  mutate(acousticness = mean(acousticness),
+         danceability = mean(danceability),
+         energy = mean(energy),
+         instrumentalness = mean(instrumentalness),
+         liveness = mean(liveness),
+         speechiness = mean(speechiness),
+         tempo = mean(tempo),
+         valence = mean(valence)) %>% 
+  distinct(playlist_genre, .keep_all = TRUE) %>% 
+  ungroup()
+
+colMax <- function (x) { apply(x, MARGIN=c(2), FUN = max) }
+colMin <- function (x) { apply(x, MARGIN=c(2), FUN = min) }
+maxmin <- data.frame(max=colMax(caracteristicas),
+                     min=colMin(caracteristicas)) %>% t() %>% 
+  as_tibble() %>% 
+  select(-playlist_genre) %>%
+  mutate(playlist_genre = "NA")
+
+caracteristicas2 <- rbind(maxmin, caracteristicas) %>% 
+  as.data.frame() 
+```
+
+```{r, fig.show="hold", out.width = "33%", preview = TRUE}
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("edm", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as_tibble() %>% 
+  radarchart(pcol = "#FFA0FB", pfcol = scales::alpha("#FFA0FB", 0.3),
+             plwd = 3, cglcol="grey", cglty = 1, axislabcol="black",
+             cglwd = 0.8, title = "EDM", vlcex = 1.4, cex.main = 1.5)
+
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("latin", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as.data.frame() %>% 
+  fmsb::radarchart(pcol = "steelblue3", plwd = 3, cglcol="grey", 
+                   pfcol = scales::alpha("steelblue3", 0.3), cglty = 1,
+                   axislabcol="black", cglwd = 0.8, title = "LATIN",
+                   vlcex = 1.4, cex.main = 1.5)
+
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("pop", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as.data.frame() %>% 
+  fmsb::radarchart(pcol = "purple", plwd = 3, cglcol="grey", 
+                   pfcol = scales::alpha("purple", 0.3), cglty = 1,
+                   axislabcol="black", cglwd = 0.8, title = "POP",
+                   vlcex = 1.4, cex.main = 1.5) 
+```
+
+```{r, fig.show="hold", out.width = "33%"}
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("r&b", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as.data.frame() %>% 
+  fmsb::radarchart(pcol = "green", pfcol = scales::alpha("green", 0.3),
+                   plwd = 3, cglcol="grey", cglty = 1, axislabcol="black",
+                   cglwd = 0.8, title = "R&B", vlcex = 1.4, cex.main = 1.5)
+
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("rap", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as.data.frame() %>% 
+  fmsb::radarchart(pcol = "yellow", plwd = 3, cglcol="grey", 
+                   pfcol = scales::alpha("yellow", 0.3), cglty = 1,
+                   axislabcol="black", cglwd = 0.8, title = "RAP",
+                   vlcex = 1.4, cex.main = 1.5)
+
+caracteristicas2 %>% 
+  filter(playlist_genre %in% c("rock", "NA")) %>% 
+  select(-playlist_genre) %>% 
+  sapply(as.numeric) %>% 
+  as.data.frame() %>% 
+  fmsb::radarchart(pcol = "brown", plwd = 3, cglcol="grey", 
+                   pfcol = scales::alpha("brown", 0.3), cglty = 1,
+                   axislabcol="black", cglwd = 0.8, title = "ROCK",
+                   vlcex = 1.4, cex.main = 1.5)
+```
+
+Dos gráficos acima podemos notar que o gênero EDM possui, em média, mais características de energia, instrumentalidade, da categoria *liveness* e mais batidas por minuto, medida pela variável *tempo*, entretanto, apresentam músicas com baixa valência (*valence*), indicando músicas mais tristes e deprimidas. As músicas latinas se caracterizam por alta dançabilidade, por possuírem alto grau de postividade e alegria (alto índice valência) e acústica. O RAP se caracteriza por músicas com muitas palavras (*speechiness*) e por possuírem um alto grau de dançabilidade. 
+
+O R&B apresenta altos níveis de dançabilidade, valência e o maior grau de acústica. Já o Rock tem como característica músicas com mais batidas por minuto, alto probabilidade de músicas executadas ao vivo e são mais enérgicas. Por último, o POP apresenta características técnincas de maior energia e dançabilidade.
+
+A variável volume (*loudness*) mede a intensidade geral das músicas em escala de decibéis (dB), variando, geralmente, entre -60 e 0, esta medida é útil para comparar o volume relativo das faixas. Assim, músicas do gênero Rock e R&B são mais intensas do que as dos demais genêros.
+
+```{r}
+spotify_tidy %>% 
+  ggplot(aes(
+    x = loudness,
+    y = stringr::str_to_upper(playlist_genre),
+    fill = playlist_genre))+
+  ggridges::geom_density_ridges(show.legend = F, alpha = 0.5)+
+  scale_fill_brewer(palette = 'Set3')+
+  labs(
+    x = 'Loudness',
+    y = 'Gênero musical',
+    title = 'Volume das músicas por gênero musical'
+  )+
+  theme_minimal()
+```
+
+Em relação à duração das músicas, identifica-se que R&B e Rock possuem músicas, na média, que são mais longas quando comparadas com as músicas latinas, pop e EDM. Já o gênero RAP possui, na média, músicas com menor duração, quando comparadas com os demais gêneros analisados.
+
+```{r}
+spotify_tidy %>% 
+  filter(duration_ms > 0) %>% 
+  mutate(duration_s = (duration_ms/1000)) %>% 
+  ggplot(aes(
+    x = duration_s,
+    y = stringr::str_to_upper(playlist_genre),
+    fill = stringr::str_to_upper(playlist_genre))
+    )+
+  ggridges::geom_density_ridges(alpha = 0.5, show.legend = F)+
+  scale_fill_brewer(palette = 'Set3')+
+  labs(
+    x = 'Duração (em segundos)',
+    y = 'Gênero musical',
+    title = 'Duração das músicas, por gênero, em segundos'
+  )+
+  theme_minimal()
+  
+  
+#geom_boxplot(aes(fill=playlist_genre), show.legend = F, alpha = 0.3)+
+#scale_fill_brewer(palette = 'Set3')+
+#labs(
+#  x = 'Gênero musical',
+#  y = 'Duração (em segundos)',
+#  title = 'Duração das músicas, por gênero, em segundos')+
+#theme_bw()
+```
+
+O gênero Eletronic Dance Music possui a maior dispersão na duração das músicas, apresentando uma das maiores médias entre os gêneros analisados, entretanto, apresenta a menor duração mediana destes gêneros, assim, neste estilo musical, são observadas músicas com menos de 2 minutos de duração, até músicas com quase 7 minutos de duração. O Rock também apresenta grande dispersão de valores na duração de suas músicas. 
+
+```{r}
+spotify_tidy %>% 
+  group_by(playlist_genre) %>% 
+  summarise(
+    `Duração média da música` = funcao_que_arruma_numero(mean(duration_ms/1000)),
+    `Duração mediana da música` = funcao_que_arruma_numero(median(duration_ms/1000)),
+    `Desvio Padrão` = funcao_que_arruma_numero(sd(duration_ms/1000))
+  )  %>% 
+  mutate(playlist_genre = stringr::str_to_upper(playlist_genre)) %>% 
+  kable() %>% 
+  kable_minimal()
+```
+
+# Conclusão
+
+Com relação ao primeiro objetivo desta análise, concluímos descritivamente que os fatores relevantes para a popularidade de uma música são a época do seu lançamento e característica das pessoas que compuseram a música. Identificamos que a longevidade e número de músicas das pessoas tem relação com a popularidade de suas músicas.
+
+A partir do segundo objetivo, podemos concluir que, quando os fatores são observados por gênero musical, são perceptíveis determinados padrões existentes nos gêneros musicais, que podem explicar, entre outras coisas, a popularidade das músicas de cada gênero.

@@ -117,7 +117,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["analise-da-base-rais_files/anchor-4.2.2/anchor.min.js","analise-da-base-rais_files/bowser-1.9.3/bowser.min.js","analise-da-base-rais_files/distill-2.2.21/template.v2.js","analise-da-base-rais_files/header-attrs-2.11/header-attrs.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.min.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.min.map","analise-da-base-rais_files/popper-2.6.0/popper.min.js","analise-da-base-rais_files/tippy-6.2.7/tippy-bundle.umd.min.js","analise-da-base-rais_files/tippy-6.2.7/tippy-light-border.css","analise-da-base-rais_files/tippy-6.2.7/tippy.css","analise-da-base-rais_files/tippy-6.2.7/tippy.umd.min.js","analise-da-base-rais_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["analise-da-base-rais_files/anchor-4.2.2/anchor.min.js","analise-da-base-rais_files/bowser-1.9.3/bowser.min.js","analise-da-base-rais_files/distill-2.2.21/template.v2.js","analise-da-base-rais_files/figure-html5/ano-1.png","analise-da-base-rais_files/figure-html5/grafico_mediana-1.png","analise-da-base-rais_files/figure-html5/grafico_uf-1.png","analise-da-base-rais_files/figure-html5/resumo_escolaridade-1.png","analise-da-base-rais_files/figure-html5/resumo_sexo-1.png","analise-da-base-rais_files/figure-html5/salario_escolaridade-1.png","analise-da-base-rais_files/figure-html5/testes-1.png","analise-da-base-rais_files/figure-html5/unnamed-chunk-3-1.png","analise-da-base-rais_files/figure-html5/unnamed-chunk-4-1.png","analise-da-base-rais_files/figure-html5/unnamed-chunk-5-1.png","analise-da-base-rais_files/header-attrs-2.11/header-attrs.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.min.js","analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.min.map","analise-da-base-rais_files/popper-2.6.0/popper.min.js","analise-da-base-rais_files/tippy-6.2.7/tippy-bundle.umd.min.js","analise-da-base-rais_files/tippy-6.2.7/tippy-light-border.css","analise-da-base-rais_files/tippy-6.2.7/tippy.css","analise-da-base-rais_files/tippy-6.2.7/tippy.umd.min.js","analise-da-base-rais_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1439,6 +1439,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   <!--/radix_placeholder_distill-->
   <script src="analise-da-base-rais_files/header-attrs-2.11/header-attrs.js"></script>
+  <script src="analise-da-base-rais_files/kePrint-0.0.1/kePrint.js"></script>
+  <link href="analise-da-base-rais_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
   <script src="analise-da-base-rais_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <script src="analise-da-base-rais_files/popper-2.6.0/popper.min.js"></script>
   <link href="analise-da-base-rais_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
@@ -1487,12 +1489,4001 @@ class="uri">https://www.linkedin.com/in/brenosapereira/</a> (Doutorando
 </div>
 
 <div class="d-article">
-<p>Distill is a publication format for scientific and technical writing,
-native to the web.</p>
-<p>Learn more about using Distill at <a
-href="https://rstudio.github.io/distill"
-class="uri">https://rstudio.github.io/distill</a>.</p>
-<div class="sourceCode" id="cb1"><pre
+<h1
+id="quanto-ganha-um-cientista-de-dados-baseado-nas-informações-disponíveis-na-rais">Quanto
+ganha um cientista de dados baseado nas informações disponíveis na RAIS
+?</h1>
+<h2 id="acessando-os-dados-da-rais">Acessando os dados da RAIS</h2>
+<p>De forma inicial, iremos chamar os pacotes necessários na análise de
+todo o projeto.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://bigrquery.r-dbi.org'>bigrquery</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://rpkgs.datanovia.com/ggpubr/'>ggpubr</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://haozhu233.github.io/kableExtra/'>kableExtra</a></span><span class='op'>)</span>
+<span class='co'>#library(gtsummary)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://forcats.tidyverse.org'>forcats</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/rpradosiqueira/sidrar/'>sidrar</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/meirelesff/deflatebr/'>deflateBR</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://scales.r-lib.org'>scales</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://jtools.jacob-long.com'>jtools</a></span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Vamos utilizar o <a href="https://basedosdados.org">datalake da
+iniciativa Base dos Dados</a>.</p>
+<p>Neste banco de dados estão disponíveis informações sobre o ano da
+admissão ou desligamento do funcionário, além de identificar o município
+e estado destas ocorrências a nível individual, entretanto, não é
+possível identificar quem são esses pessoas. Outros elementos
+disponíveis estão relacionados com o valor de remuneração do trabalhador
+e a área em que este trabalho ocorre, identificando características como
+o setor da empresa (através do código da CNAE) e o tamanho do
+estabelecimento (pelo número de empregados).</p>
+<p>Os dados analisados neste projeto referencem às pessoas que
+(potencialmente) trabalham com ciência de dados. <strong>Por que
+“potencialmente” ?</strong> Existe um Código Brasileiro de Ocupações
+(CBO), que tem um cadastro de todas as ocupações formais no Brasil,
+entretanto o Cientista de Dados ainda não está classificado formalmente
+na CBO, por ser uma classificação ainda muito recente. Para contornar
+esse problema, serão utilizados alguns códigos da CBO que são
+relacionados a ciência de dados e filtrar da RAIS para obter os dados
+dessas pessoas, apontados a seguir:</p>
+<ul>
+<li>1311-20 -&gt; Gerente de serviços sociais (chefe de pesquisa e
+estatística);</li>
+<li>2111-10 -&gt; Especialista em pesquisa operacional;</li>
+<li>2112-05 -&gt; Estatístico (analista);</li>
+<li>2112-10 -&gt; Estatístico (estatística aplicada);</li>
+<li>2112-15 -&gt; Estatístico (teórico);</li>
+<li>2525-15 -&gt; Analista de cobrança (instituições financeiras);</li>
+<li>2525-25 -&gt; Analista de crédito (instituições financeiras);</li>
+<li>4110-35 -&gt; Auxiliar de estatística.</li>
+</ul>
+<p>Assim, queremos identificar <strong>qual o salário de quem trabalha
+com ciência de dados</strong> e algumas especificações dessa área, como
+locais com maiores salários médios e ocupações em que o cientista de
+dados possua maior remuneração.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>codigos_cbo</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span> <span class='st'>"252515"</span>, <span class='st'>"252525"</span>, <span class='st'>"211110"</span>, 
+                  <span class='co'># pesquisa/cientista </span>
+                  <span class='st'>"211205"</span>, <span class='st'>"211210"</span>,<span class='st'>"411035"</span>,
+                  <span class='st'>"131120"</span>,<span class='st'>"211215"</span> 
+                  <span class='co'># ocupações estatísticas</span>
+                  <span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Agora vamos carregar a base de dados da RAIS das ocupações que estão
+relacionadas à ciência de dados em sua totalidade a partir do ano
+2013.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>microdados_cd_tbl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='va'>conexao</span>, <span class='st'>'microdados_vinculos'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='fu'><a href='https://tidyselect.r-lib.org/reference/everything.html'>everything</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span>
+    <span class='va'>ano</span> <span class='op'>&gt;=</span> <span class='fl'>2013</span>,
+    <span class='va'>cbo_2002</span> <span class='op'><a href='https://rdrr.io/r/base/match.html'>%in%</a></span> <span class='va'>codigos_cbo</span>
+  <span class='op'>)</span>
+
+<span class='va'>df_microdados_cd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect</a></span><span class='op'>(</span><span class='va'>microdados_cd_tbl</span><span class='op'>)</span>
+
+<span class='co'># Deflacionando os valores da remuneração média (ano base = 2019)</span>
+<span class='va'>df_microdados_cd</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>dates <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>df_microdados_cd</span><span class='op'>$</span><span class='va'>ano</span><span class='op'>)</span>, 
+                         format <span class='op'>=</span> <span class='st'>'%Y'</span><span class='op'>)</span>,
+         remuneracao_media_defl <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/deflateBR/man/deflate.html'>deflate</a></span><span class='op'>(</span><span class='va'>valor_remuneracao_media</span>,
+                                          <span class='va'>dates</span>,
+                                          real_date <span class='op'>=</span> <span class='st'>'12/2019'</span>,
+                                          index <span class='op'>=</span> <span class='st'>'ipca'</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span>
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kbl.html'>kbl</a></span><span class='op'>(</span>caption <span class='op'>=</span> <span class='st'>'Exemplo dos microdados - 10 primeiras observações da lista'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_classic.html'>kable_paper</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/scroll_box.html'>scroll_box</a></span><span class='op'>(</span>height <span class='op'>=</span> <span class='st'>'300px'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<div
+style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; ">
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:microdados">Table 1: </span>Exemplo dos microdados - 10 primeiras observações da
+lista
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+ano
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+sigla_uf
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+id_municipio
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tipo_vinculo
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+vinculo_ativo_3112
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tipo_admissao
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mes_admissao
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mes_desligamento
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+motivo_desligamento
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+causa_desligamento_1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+causa_desligamento_2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+causa_desligamento_3
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+faixa_tempo_emprego
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+tempo_emprego
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+faixa_horas_contratadas
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+quantidade_horas_contratadas
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+id_municipio_trabalho
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+quantidade_dias_afastamento
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+indicador_cei_vinculado
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+indicador_trabalho_parcial
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+indicador_trabalho_intermitente
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+faixa_remuneracao_media_sm
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_media_sm
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_media
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+faixa_remuneracao_dezembro_sm
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_dezembro_sm
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_janeiro
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_fevereiro
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_marco
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_abril
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_maio
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_junho
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_julho
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_agosto
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_setembro
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_outubro
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_novembro
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_remuneracao_dezembro
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tipo_salario
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+valor_salario_contratual
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+subatividade_ibge
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+subsetor_ibge
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cbo_1994
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cbo_2002
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cnae_1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cnae_2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cnae_2_subclasse
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+faixa_etaria
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+idade
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+grau_instrucao_1985_2005
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+grau_instrucao_apos_2005
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+nacionalidade
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+sexo
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+raca_cor
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+indicador_portador_deficiencia
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tipo_deficiencia
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+ano_chegada_brasil
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tamanho_estabelecimento
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+tipo_estabelecimento
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+natureza_juridica
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+indicador_simples
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+bairros_sp
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+distritos_sp
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+bairros_fortaleza
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+bairros_rj
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+regioes_administrativas_df
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+dates
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+remuneracao_media_defl
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400050
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+10.5
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400050
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+1.44
+</td>
+<td style="text-align:right;">
+1045.45
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+1.38
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+1000.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+411035
+</td>
+<td style="text-align:left;">
+91995
+</td>
+<td style="text-align:left;">
+94308
+</td>
+<td style="text-align:left;">
+9430800
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3999
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+1426.7607
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400050
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+9.9
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400050
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+1.38
+</td>
+<td style="text-align:right;">
+1000.00
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+1.38
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+1000.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+411035
+</td>
+<td style="text-align:left;">
+91995
+</td>
+<td style="text-align:left;">
+94308
+</td>
+<td style="text-align:left;">
+9430800
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3999
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+1364.7336
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+30
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+367.9
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+16.81
+</td>
+<td style="text-align:right;">
+12177.63
+</td>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:right;">
+21.79
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+15777.70
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+75116
+</td>
+<td style="text-align:left;">
+84116
+</td>
+<td style="text-align:left;">
+8411600
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+61
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1015
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+16619.2203
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+30
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:right;">
+14.7
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:right;">
+2.16
+</td>
+<td style="text-align:right;">
+1570.02
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+75116
+</td>
+<td style="text-align:left;">
+84116
+</td>
+<td style="text-align:left;">
+8411600
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1023
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+2142.6590
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+30
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+64.9
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+6.43
+</td>
+<td style="text-align:right;">
+4661.69
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+8.51
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+6164.24
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+75116
+</td>
+<td style="text-align:left;">
+84116
+</td>
+<td style="text-align:left;">
+8411600
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1023
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+6361.9648
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+21
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+5.2
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+1.52
+</td>
+<td style="text-align:right;">
+1112.39
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+252525
+</td>
+<td style="text-align:left;">
+74993
+</td>
+<td style="text-align:left;">
+82911
+</td>
+<td style="text-align:left;">
+8291100
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2135
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+1518.1160
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+50
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+28.5
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+120
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+1.41
+</td>
+<td style="text-align:right;">
+1028.00
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+252525
+</td>
+<td style="text-align:left;">
+74993
+</td>
+<td style="text-align:left;">
+82911
+</td>
+<td style="text-align:left;">
+8291100
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2062
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+1402.9461
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+6.9
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+724.00
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+724.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+80152
+</td>
+<td style="text-align:left;">
+85139
+</td>
+<td style="text-align:left;">
+8513900
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2062
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+988.0671
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+121.9
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+13.17
+</td>
+<td style="text-align:right;">
+9542.16
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+13.34
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+9659.10
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+131120
+</td>
+<td style="text-align:left;">
+85324
+</td>
+<td style="text-align:left;">
+88006
+</td>
+<td style="text-align:left;">
+8800600
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3999
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+13022.5059
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+53.9
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:left;">
+1400100
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+1.19
+</td>
+<td style="text-align:right;">
+867.62
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+1.43
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+1038.34
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+252525
+</td>
+<td style="text-align:left;">
+67199
+</td>
+<td style="text-align:left;">
+66193
+</td>
+<td style="text-align:left;">
+6619302
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2062
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2014-04-08
+</td>
+<td style="text-align:right;">
+1184.0701
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Da tabela acima, identifica-se um trabalhador do sexo masculino (sexo
+= 1), na área de auxiliar de estatística e com uma remuneração média de
+R$ 1.045,45 para um total de 390.583 observações.</p>
+<p>Em posse de informações como esta podemos avançar na análise dos
+salários dos cientistas de dados desde 2013. Nó tópico a seguir serão
+apresentados questionamentos adicionais que possam auxiliar na questão
+de quanto recebe uma pessoa que trabalha com <strong>Ciência de
+Dados</strong> ?</p>
+<h2 id="perguntas-de-pesquisa">Perguntas de pesquisa</h2>
+<ol type="1">
+<li><p>Quanto o salário médio varia no tempo?</p></li>
+<li><p>Quanto o salário médio varia regionalmente?</p></li>
+<li><p>Quanto o salário médio varia por característica das pessoas? -
+Gênero - Raça/Cor - Grau de instrução</p></li>
+</ol>
+<h3 id="como-variam-os-salários-médios-no-tempo">Como variam os salários
+médios no tempo?</h3>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df_ano</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>ano</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>media_ano <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span>,
+            mediana_ano <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>df_ano</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>ano</span>, y <span class='op'>=</span> <span class='va'>media_ano</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>'steelblue4'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='va'>media_ano</span>,
+                               nsmall <span class='op'>=</span> <span class='fl'>2</span>,
+                               digits <span class='op'>=</span> <span class='fl'>1</span>,
+                               big.mark <span class='op'>=</span> <span class='st'>'.'</span>,
+                               decimal.mark <span class='op'>=</span> <span class='st'>','</span><span class='op'>)</span>,
+                vjust <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.3</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>'Ano'</span>, y <span class='op'>=</span> <span class='st'>'Média Salarial (R$)'</span>, title <span class='op'>=</span> <span class='st'>'Média salarial a preços constantes (ano base: 2019)'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_y_continuous</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>6000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_x_continuous</a></span><span class='op'>(</span>breaks <span class='op'>=</span> <span class='fl'>2013</span><span class='op'>:</span><span class='fl'>2019</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>panel.grid.major.x <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>vjust <span class='op'>=</span> <span class='fl'>1.1</span>, hjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/ano-1.png" width="624" /></p>
+</div>
+<p>Identifica-se que, observando apenas o crescimento da remuneração
+média ao longo dos anos, houve um pico salarial no ano de 2017,
+atingindo R$ 5.483.87. Assim, constata-se que, de forma geral, o salário
+médio do cientista de dados (a preços constantes de 2019) se mantém em
+cerca de R$ 5.000,00.</p>
+<p>Como no mercado de trabalho pode existir algumas poucas remunerações
+que são bem diferentes das demais (as observações <em>outliers</em>),
+vamos observar a mediana das remunerações, com o intuito de identificar
+algum indício de que exista distorção na distribuição das remunerações,
+uma vez que a mediana representa o valor numérico que separa a metade
+superior de um conjunto de sua metade inferior.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>df_ano</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>ano</span>, y <span class='op'>=</span> <span class='va'>mediana_ano</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>'steelblue4'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='va'>mediana_ano</span>,
+                               nsmall <span class='op'>=</span> <span class='fl'>2</span>,
+                               digits <span class='op'>=</span> <span class='fl'>1</span>,
+                               big.mark <span class='op'>=</span> <span class='st'>'.'</span>,
+                               decimal.mark <span class='op'>=</span> <span class='st'>','</span><span class='op'>)</span>,
+                vjust <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.3</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>'Ano'</span>, y <span class='op'>=</span> <span class='st'>'Mediana Salarial (R$)'</span>, title <span class='op'>=</span> <span class='st'>'Mediana salarial a preços constantes (ano base: 2019)'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_y_continuous</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>6000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_x_continuous</a></span><span class='op'>(</span>breaks <span class='op'>=</span> <span class='fl'>2013</span><span class='op'>:</span><span class='fl'>2019</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>panel.grid.major.x <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>vjust <span class='op'>=</span> <span class='fl'>1.1</span>, hjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/grafico_mediana-1.png" width="624" /></p>
+</div>
+<p>Deste gráfico, podemos identificar que a mediana do conjunto de
+remunerações é relativamente menor do que os valores observado na média
+das remunerações, entretanto, com o passar do tempo a mediana salarial
+aumentou mais do que o observado com a média salarial, dando evidências
+de que mesmo havendo distorção salarial e excluindo o efeito de valores
+<em>outliers</em>, houve um aumento significativo na renda do cientista
+de dados (23%, no ano de 2019 em relação a 2013, já excluindo o efeito
+da inflação).</p>
+<p>Esta distorção salarial pode estar relacionada, entre outros fatores,
+ao fato de que os códigos da CBO não identificam nenhuma hierarquia de
+cargo, não podendo se diferenciar nesta base de dados, por exemplo, um
+cientista de dados júnior de um cientista de dados pleno ou sênior.</p>
+<p>Além disso, pode haver distorções entre os códigos da CBO utilizados,
+com algumas ocupações sendo mais bem remuneradas do que outras (caso que
+será estudado mais adiante), assim como, diferenças regionais, próxima
+hipótese a ser estudada.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df_ano</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kbl.html'>kbl</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>2</span>, caption <span class='op'>=</span> <span class='st'>'Média e mediana salarial por ano a preços constantes (ano base = 2019)'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_classic.html'>kable_paper</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>
+(#tab:tabela_ano)Média e mediana salarial por ano a preços constantes
+(ano base = 2019)
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+ano
+</th>
+<th style="text-align:right;">
+media_ano
+</th>
+<th style="text-align:right;">
+mediana_ano
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:right;">
+5008.97
+</td>
+<td style="text-align:right;">
+2952.57
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+5052.42
+</td>
+<td style="text-align:right;">
+3085.39
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+5338.16
+</td>
+<td style="text-align:right;">
+3195.69
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:right;">
+5087.64
+</td>
+<td style="text-align:right;">
+3346.13
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2017
+</td>
+<td style="text-align:right;">
+5483.87
+</td>
+<td style="text-align:right;">
+3768.30
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2018
+</td>
+<td style="text-align:right;">
+5250.58
+</td>
+<td style="text-align:right;">
+3616.10
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+5106.45
+</td>
+<td style="text-align:right;">
+3642.08
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2020
+</td>
+<td style="text-align:right;">
+4798.09
+</td>
+<td style="text-align:right;">
+3394.86
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="quanto-o-salário-varia-regionalmente">Quanto o salário varia
+regionalmente?</h3>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df_uf</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>sigla_uf</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>media_uf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span>,
+            mediana_uf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>df_uf</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kbl.html'>kbl</a></span><span class='op'>(</span>caption <span class='op'>=</span> <span class='st'>'Média e mediana do salário por Unidade da Federação'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_classic.html'>kable_paper</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/scroll_box.html'>scroll_box</a></span><span class='op'>(</span>height <span class='op'>=</span> <span class='st'>'200px'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<div
+style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; ">
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>
+(#tab:tabela_uf)Média e mediana do salário por Unidade da Federação
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+sigla_uf
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+media_uf
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mediana_uf
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+AC
+</td>
+<td style="text-align:right;">
+2653.161
+</td>
+<td style="text-align:right;">
+1629.272
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AL
+</td>
+<td style="text-align:right;">
+2300.513
+</td>
+<td style="text-align:right;">
+1584.964
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AM
+</td>
+<td style="text-align:right;">
+4625.566
+</td>
+<td style="text-align:right;">
+3830.520
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AP
+</td>
+<td style="text-align:right;">
+3040.034
+</td>
+<td style="text-align:right;">
+1881.368
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BA
+</td>
+<td style="text-align:right;">
+4081.393
+</td>
+<td style="text-align:right;">
+2307.674
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CE
+</td>
+<td style="text-align:right;">
+4137.112
+</td>
+<td style="text-align:right;">
+2049.516
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DF
+</td>
+<td style="text-align:right;">
+7669.432
+</td>
+<td style="text-align:right;">
+5947.539
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ES
+</td>
+<td style="text-align:right;">
+2739.243
+</td>
+<td style="text-align:right;">
+1756.881
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GO
+</td>
+<td style="text-align:right;">
+3613.911
+</td>
+<td style="text-align:right;">
+2209.998
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:right;">
+1908.077
+</td>
+<td style="text-align:right;">
+1182.362
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MG
+</td>
+<td style="text-align:right;">
+4000.365
+</td>
+<td style="text-align:right;">
+2582.620
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MS
+</td>
+<td style="text-align:right;">
+3182.490
+</td>
+<td style="text-align:right;">
+2704.479
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MT
+</td>
+<td style="text-align:right;">
+2994.833
+</td>
+<td style="text-align:right;">
+2259.989
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PA
+</td>
+<td style="text-align:right;">
+5020.044
+</td>
+<td style="text-align:right;">
+2660.518
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PB
+</td>
+<td style="text-align:right;">
+2232.446
+</td>
+<td style="text-align:right;">
+1457.862
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PE
+</td>
+<td style="text-align:right;">
+4869.492
+</td>
+<td style="text-align:right;">
+2987.156
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PI
+</td>
+<td style="text-align:right;">
+1886.925
+</td>
+<td style="text-align:right;">
+1342.721
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PR
+</td>
+<td style="text-align:right;">
+3451.283
+</td>
+<td style="text-align:right;">
+2158.205
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RJ
+</td>
+<td style="text-align:right;">
+8704.632
+</td>
+<td style="text-align:right;">
+9188.656
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RN
+</td>
+<td style="text-align:right;">
+3021.090
+</td>
+<td style="text-align:right;">
+2749.472
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RO
+</td>
+<td style="text-align:right;">
+2315.762
+</td>
+<td style="text-align:right;">
+1641.629
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:right;">
+3144.404
+</td>
+<td style="text-align:right;">
+2342.876
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RS
+</td>
+<td style="text-align:right;">
+4135.914
+</td>
+<td style="text-align:right;">
+2753.498
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SC
+</td>
+<td style="text-align:right;">
+3638.149
+</td>
+<td style="text-align:right;">
+2268.005
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SE
+</td>
+<td style="text-align:right;">
+4395.160
+</td>
+<td style="text-align:right;">
+2476.440
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SP
+</td>
+<td style="text-align:right;">
+5898.167
+</td>
+<td style="text-align:right;">
+4535.110
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TO
+</td>
+<td style="text-align:right;">
+2305.233
+</td>
+<td style="text-align:right;">
+1573.539
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Através de um gráfico, abaixo, podemos identificar mais facilmente
+que o Rio de Janeiro, Distrito Federal e São Paulo possuem as maiores
+remunerações médias e medianas. Com estes 2 gráficos pode-se perceber
+uma grande disparidade salarial entre algumas localidades, sendo
+observado salários médios de R$ 8704.63 e R$ 7669.43, no RJ e DF,
+respectivamente, enquanto que no Piauí e Maranhão, os salários médios
+foram de R$ 1908.08 e R$ 1886.93, respectivamente.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>g1</span> <span class='op'>&lt;-</span> <span class='va'>df_uf</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>
+    sigla_uf <span class='op'>=</span> <span class='fu'><a href='https://forcats.tidyverse.org/reference/fct_reorder.html'>fct_reorder</a></span><span class='op'>(</span><span class='va'>sigla_uf</span>, <span class='va'>media_uf</span><span class='op'>)</span>
+  <span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>sigla_uf</span>, x <span class='op'>=</span> <span class='va'>media_uf</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>'steelblue4'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>'Unidade da Federação'</span>, x <span class='op'>=</span> <span class='st'>'Média Salarial (R$)'</span>,
+       title <span class='op'>=</span> <span class='st'>'Media salarial por UF'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_x_continuous</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>10000</span><span class='op'>)</span>, breaks <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>12000</span>,<span class='fl'>2000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>panel.grid.major.y <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>vjust <span class='op'>=</span> <span class='fl'>1.1</span>, hjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>g2</span> <span class='op'>&lt;-</span> <span class='va'>df_uf</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>
+    sigla_uf <span class='op'>=</span> <span class='fu'><a href='https://forcats.tidyverse.org/reference/fct_reorder.html'>fct_reorder</a></span><span class='op'>(</span><span class='va'>sigla_uf</span>, <span class='va'>mediana_uf</span><span class='op'>)</span>
+  <span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>mediana_uf</span>, y <span class='op'>=</span> <span class='va'>sigla_uf</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>'steelblue4'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>'Unidade da Federação'</span>, x <span class='op'>=</span> <span class='st'>'Mediana Salarial (R$)'</span>,
+       title <span class='op'>=</span> <span class='st'>'Mediana salarial por UF'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_x_continuous</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>10000</span><span class='op'>)</span>, breaks <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>12000</span>,<span class='fl'>2000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>panel.grid.major.y <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>vjust <span class='op'>=</span> <span class='fl'>1.1</span>, hjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html'>ggarrange</a></span><span class='op'>(</span><span class='va'>g1</span>, <span class='va'>g2</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/grafico_uf-1.png" width="624" /></p>
+</div>
+<p>Diferentemente dos demais estados, a mediana salarial no RJ é maior
+do que sua média salarial, pode-se concluir que no Rio os valoresde
+salário na parte de baixo da distribuição estão muito distantes do
+centro, em comparação aos valores que estão no topo desta distribuição,
+ou seja, pode-se concluir que no RJ os salários dos cientistas de dados
+são bastante elevados quando comparados com a média nacional e dos
+demais estados.</p>
+<p>Ao se identificar tamanha disparidade salarial entre alguns estados,
+demanda observar se esta diferença pode estar relacionada a um mercado
+mais estruturado em determinadas localidades, justificando maiores
+salários em algumas regiões. Porém, este será apenas um exercício para
+projetos futuros.</p>
+<h3 id="os-salário-variam-por-sexo">Os salário variam por sexo?</h3>
+<p>De forma inicial, destaca-se que existe um número maior de mulheres
+(sexo = 2) empregadas neste setor, correspondendo a 57% dos
+trabalhadores que fazem parte das ocupações selecionadas
+anteriormente.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>sexo</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>soma <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kbl.html'>kbl</a></span><span class='op'>(</span>caption <span class='op'>=</span> <span class='st'>'Quantidade de homens e mulheres ocupados nestes setor'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_classic.html'>kable_paper</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-2">Table 2: </span>Quantidade de homens e mulheres ocupados nestes
+setor
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+sexo
+</th>
+<th style="text-align:right;">
+soma
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+166592
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+223991
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Ao considerar as diversas ocupações (atentar para as escalas de cada
+gráfico), percebe-se que existe uma heterogeneidade na ocupação de cada
+código do CBO, com os homens sendo maioria nas áreas de Especialista em
+pesquisa operacional (2111-10), Estatístico - analista (2112-05) e
+Auxiliar de estatística (4110-35). Já as mulheres são maioria expressiva
+nas ocupações de Gerente de serrviços sociais - chefes de pesquisa e
+estatística (1311-20), Estatística aplicada (2112-10), Analista de
+cobrança e de crédito, 2525-15 e 2525-25, respectivamente.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>resumo_sexo</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>cbo_2002</span>, <span class='va'>sexo</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>soma <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>resumo_sexo</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>sexo</span>, y <span class='op'>=</span> <span class='va'>soma</span>, fill <span class='op'>=</span> <span class='va'>sexo</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>'dodge'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='va'>soma</span><span class='op'>)</span>,
+            vjust <span class='op'>=</span> <span class='fl'>1.2</span>,
+            color <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>resumo_sexo</span><span class='op'>$</span><span class='va'>sexo</span> <span class='op'>==</span> <span class='st'>'1'</span>, <span class='st'>'black'</span>, <span class='st'>'white'</span><span class='op'>)</span>,
+            position <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/position_dodge.html'>position_dodge</a></span><span class='op'>(</span>width <span class='op'>=</span> <span class='fl'>0.9</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='st'>''</span>, y<span class='op'>=</span><span class='st'>''</span>,
+       title <span class='op'>=</span> <span class='st'>'Número de trabalhadores por CBO'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_discrete.html'>scale_x_discrete</a></span><span class='op'>(</span>labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Masculino'</span>, <span class='st'>'Feminino'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#CFAA3D"</span>, <span class='st'>"#85898C"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>'None'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/facet_wrap.html'>facet_wrap</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>cbo_2002</span>, scales <span class='op'>=</span> <span class='st'>'free'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/resumo_sexo-1.png" width="624" /></p>
+</div>
+<p>Visto como se dão as ocupações do mercado de trabalho em relação ao
+sexo, vamos agora observar como os rendimentos estão dispostos.
+Inicialmente, será analisado o mercado de ciências de dados de forma
+mais geral, posteriormente, serão destacados os rendimentos por tipo de
+ocupação, com o intuito de observar se existe diferencial salarial entre
+as diversas áreas da ciências de dados.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>salario_sexo</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>cbo_2002</span>, <span class='va'>sexo</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>media_sexo <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span>,
+            mediana_sexo <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>salario_sexo</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kbl.html'>kbl</a></span><span class='op'>(</span>caption <span class='op'>=</span> <span class='st'>'Média e Mediana do salário por sexo e CBO'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_classic.html'>kable_paper</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/scroll_box.html'>scroll_box</a></span><span class='op'>(</span>height <span class='op'>=</span> <span class='st'>'200px'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<div
+style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; ">
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>
+(#tab:salario_sexo)Média e Mediana do salário por sexo e CBO
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cbo_2002
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+sexo
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+media_sexo
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mediana_sexo
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+131120
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+5120.223
+</td>
+<td style="text-align:right;">
+3334.845
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+131120
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+4458.223
+</td>
+<td style="text-align:right;">
+3407.779
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211110
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+7613.594
+</td>
+<td style="text-align:right;">
+5482.395
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211110
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+6053.227
+</td>
+<td style="text-align:right;">
+4718.577
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+12271.474
+</td>
+<td style="text-align:right;">
+11795.724
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211205
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+10337.319
+</td>
+<td style="text-align:right;">
+9708.249
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211210
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+7465.831
+</td>
+<td style="text-align:right;">
+5470.669
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211210
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+5530.651
+</td>
+<td style="text-align:right;">
+4428.219
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211215
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+5849.103
+</td>
+<td style="text-align:right;">
+5130.628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211215
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+4812.739
+</td>
+<td style="text-align:right;">
+4050.234
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+252515
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+4998.879
+</td>
+<td style="text-align:right;">
+3834.461
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+252515
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+3517.322
+</td>
+<td style="text-align:right;">
+2619.934
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+252525
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+5286.673
+</td>
+<td style="text-align:right;">
+3882.730
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+252525
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+3345.090
+</td>
+<td style="text-align:right;">
+2145.892
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+411035
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+5843.843
+</td>
+<td style="text-align:right;">
+6149.228
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+411035
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+4605.610
+</td>
+<td style="text-align:right;">
+2162.565
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>salario_sexo</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>cbo_2002</span>, y <span class='op'>=</span> <span class='va'>media_sexo</span>, fill <span class='op'>=</span> <span class='va'>sexo</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>'dodge'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#CFAA3D"</span>, <span class='st'>"#85898C"</span><span class='op'>)</span>,
+                       labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Masculino'</span>, <span class='st'>'Feminino'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>'Remuneração média (R$)'</span>, x <span class='op'>=</span> <span class='st'>'Códigos CBO'</span>,
+       fill <span class='op'>=</span> <span class='st'>'Sexo'</span>, title <span class='op'>=</span> <span class='st'>'Média das remunerações'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>hjust <span class='op'>=</span> <span class='fl'>1</span>, vjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
+</div>
+<p>A partir do gráfico acima é possível identificar alguns padrões
+quanto a remuneração. O primeiro, é de que todos os setores possuem um
+diferencial salarial entre os sexos, um segundo padrão é de que as
+remunerações do categoria 2112-05 (Estatístico - analista) são bem mais
+elevadas do que a média das remunerações, independente do sexo do
+trabalhador.</p>
+<p>Já ao se observar a mediana dos salários, é possível identificar que
+na categoria de auxiliar de estatística (4110-35) há um diferencial
+ainda maior do que o observado nas médias salariais. Situação inversa
+ocorre na classificação de chefe de pesquisa e estatística (1311-20), em
+que é possível observar que a maior parte da população feminina ocupada
+neste setor recebe uma remuneração pouco maior do que a população
+masculina.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>salario_sexo</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>cbo_2002</span>, y <span class='op'>=</span> <span class='va'>mediana_sexo</span>, fill <span class='op'>=</span> <span class='va'>sexo</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>'dodge'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#CFAA3D"</span>, <span class='st'>"#85898C"</span><span class='op'>)</span>,
+                       labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Masculino'</span>, <span class='st'>'Feminino'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>'Remuneração média (R$)'</span>, x <span class='op'>=</span> <span class='st'>'Códigos CBO'</span>,
+       fill <span class='op'>=</span> <span class='st'>'Sexo'</span>, title <span class='op'>=</span> <span class='st'>'Mediana das remunerações'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>hjust <span class='op'>=</span> <span class='fl'>1</span>, vjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/unnamed-chunk-4-1.png" width="624" /></p>
+</div>
+<h3 id="os-salários-variam-por-etnia">Os salários variam por etnia
+?</h3>
+<p>É possível identificar que a raça/cor amarela possui, em média, os
+maiores salários, independete do sexo do trabalhador e, do outro lado,
+trabalhadores de raça/cor parda e negra possuem as menores remunerações
+médias, sendo necessário identificar, ainda, quais as possíveis causas
+dessas disparidades.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>resumo_etnia</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>raca_cor</span>, <span class='va'>sexo</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>
+    media <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>valor_remuneracao_media</span><span class='op'>)</span>,
+    mediana <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>valor_remuneracao_media</span><span class='op'>)</span>
+  <span class='op'>)</span>
+
+<span class='va'>resumo_etnia</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>raca_cor</span>, y <span class='op'>=</span> <span class='va'>media</span>, fill <span class='op'>=</span> <span class='va'>sexo</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>'dodge'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='va'>media</span>, 
+                               big.mark <span class='op'>=</span> <span class='st'>'.'</span>, 
+                               digits <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>,
+            vjust <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.3</span>,
+            position <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/position_dodge.html'>position_dodge</a></span><span class='op'>(</span>width <span class='op'>=</span> <span class='fl'>0.9</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>'(R$)'</span>, x <span class='op'>=</span> <span class='st'>'Raça/Cor'</span>, title <span class='op'>=</span> <span class='st'>'Remuneração média por raça/cor para cada sexo'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_y_continuous</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>8500</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#CFAA3D"</span>, <span class='st'>"#85898C"</span><span class='op'>)</span>,
+                       labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Masculino'</span>, <span class='st'>'Feminino'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_discrete.html'>scale_x_discrete</a></span><span class='op'>(</span>labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Indígena'</span>, <span class='st'>'Branca'</span>, <span class='st'>'Preta'</span>,
+                            <span class='st'>'Amarela'</span>, <span class='st'>'Parda'</span>, <span class='st'>'Não identificada'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>'bottom'</span>,
+        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        panel.grid.major.x <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>, 
+        axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>vjust <span class='op'>=</span> <span class='fl'>1.1</span>, hjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
+</div>
+<h3 id="os-salários-variam-por-grau-de-instrução">Os salários variam por
+grau de instrução ?</h3>
+<p>Para se tornar cientista de dados não é necessário ensino superior,
+entretanto, algumas colocações podem exigir este nível de instrução.
+Entre as pessoas que estão ocupadas nas classificações citadas
+anteriormente da CBO, 52% possuem pelo menos um título de graduação.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>resumo_escolar</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>grau_instrucao_apos_2005</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>grau_instrucao_apos_2005 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>grau_instrucao_apos_2005</span>,
+                                           levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'1'</span>, <span class='st'>'2'</span>, <span class='st'>'3'</span>, <span class='st'>'4'</span>,
+                                                      <span class='st'>'5'</span>, <span class='st'>'6'</span>, <span class='st'>'7'</span>, <span class='st'>'8'</span>,
+                                                      <span class='st'>'9'</span>, <span class='st'>'10'</span>, <span class='st'>'11'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>qtd <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span>,
+            media_escolar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span>,
+            mediana_escolar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>resumo_escolar</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>qtd</span>, y <span class='op'>=</span> <span class='va'>grau_instrucao_apos_2005</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>'steelblue3'</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='va'>qtd</span><span class='op'>)</span>, hjust <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>resumo_escolar</span><span class='op'>$</span><span class='va'>qtd</span> <span class='op'>&gt;</span> <span class='fl'>150000</span>,
+                                             <span class='fl'>1.1</span>,
+                                             <span class='op'>-</span><span class='fl'>0.2</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>'Quantidade'</span>, 
+       y<span class='op'>=</span><span class='st'>''</span>, 
+       title <span class='op'>=</span> <span class='st'>'Número de possíveis cientistas de dados por escolaridade'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_discrete.html'>scale_y_discrete</a></span><span class='op'>(</span>labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Analfabeto'</span>, <span class='st'>'Até 5.A Inc.'</span>, <span class='st'>'5.A Comp. Fund'</span>, 
+                              <span class='st'>'6. A 9. Fund'</span>, <span class='st'>'Fund. Comp.'</span>, <span class='st'>'Médio Inc.'</span>,
+                              <span class='st'>'Médio Comp.'</span>, <span class='st'>'Sup. Inc.'</span>, <span class='st'>'Sup. Comp.'</span>,
+                              <span class='st'>'Mestrado'</span>, <span class='st'>'Doutorado'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>hjust <span class='op'>=</span> <span class='fl'>1</span>, vjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>,
+        panel.grid.major.y <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/resumo_escolaridade-1.png" width="624" /></p>
+</div>
+<p>Em relação ao salário, o gráifco abaixo identifica valores
+inesperados nos salários dos indivíduos que são analfabetos, registrando
+valores similares aos que possuem ensino superior completo, esta
+informação inesperada pode ser devido à dados informados incorretamente
+na coleta.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>resumo_escolar</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>!</span><span class='va'>qtd</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span><span class='op'>!</span><span class='va'>grau_instrucao_apos_2005</span>,
+               names_to <span class='op'>=</span> <span class='st'>'tipo'</span>,
+               values_to <span class='op'>=</span> <span class='st'>'salario'</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>salario</span>, x <span class='op'>=</span> <span class='va'>grau_instrucao_apos_2005</span>, fill <span class='op'>=</span> <span class='va'>tipo</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>'dodge'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>''</span>, y<span class='op'>=</span><span class='st'>'Salário (R$)'</span>,
+       title <span class='op'>=</span> <span class='st'>'Média e mediana dos salários por escolaridade'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_discrete.html'>scale_x_discrete</a></span><span class='op'>(</span>labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Analfabeto'</span>, <span class='st'>'Até 5.A\nInc.'</span>, <span class='st'>'5.A Comp.\nFund'</span>, 
+                              <span class='st'>'6. A 9.\nFund'</span>, <span class='st'>'Fund.\nComp.'</span>, <span class='st'>'Médio\nInc.'</span>,
+                              <span class='st'>'Médio\nComp.'</span>, <span class='st'>'Sup.\nInc.'</span>, <span class='st'>'Sup.\nComp.'</span>,
+                              <span class='st'>'Mestrado'</span>, <span class='st'>'Doutorado'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_continuous.html'>scale_y_continuous</a></span><span class='op'>(</span>breaks <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>14000</span>, <span class='fl'>2000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#CFAA3D"</span>, <span class='st'>"#85898C"</span><span class='op'>)</span>,
+                       labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Média'</span>, <span class='st'>'Mediana'</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>hjust <span class='op'>=</span> <span class='fl'>1</span>, vjust <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>,
+        panel.grid.major.x <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
+        legend.position <span class='op'>=</span> <span class='st'>'bottom'</span>,
+        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="analise-da-base-rais_files/figure-html5/salario_escolaridade-1.png" width="624" /></p>
+</div>
+<p>Outra informação que pode ser retirarda deste gráfico é a correlação
+positiva entre os anos de escolaridade e o salário (tanto médio quanto
+mediano), fato que pode estar relacionado com o fato de que funcionários
+com maior nível de escolaridade possam alcançar posições mais
+importantes dentro de uma empresa e, consequentemente, maiores
+remunerações.</p>
+<h2 id="regressão-linear">Regressão Linear</h2>
+<p>A análise de regressão diz respeito ao estudo da dependência de uma
+variável, a <em>variável dependente</em>, em relação a uma ou mais
+variáveis, as <em>variáveis explicativas</em>, com a finalidade de
+estimar e/ou prever o valor médio da variável dependente em termos dos
+valores conhecidos ou fixados das variáveis explanatórias. Assim, para o
+nosso caso - e considerando algumas simplificações - através da
+regressão linear podemos prever a remuneração média de um cientista de
+dados a partir do conhecimento de outras variáveis, como o sexo, a
+idade, a cor/raça, a quantidade de horas trabalhadas e o grau de
+escolaridade da pessoa.</p>
+<p>Esta regressão linear utilizada pode ser representada por:</p>
+<p><span class="math display">\[
+Y_{i} = \beta_{1} + \beta_{2}X_{2i} + ... +\beta_{n}X_{ni} + u_{i}
+\]</span> Em que as variáveis <span
+class="math inline">\(X_{2i}\)</span> até <span
+class="math inline">\(X_{ni}\)</span> são as variáveis explicativas do
+modelo. Os <span class="math inline">\(\beta\)</span>’s representam os
+coeficientes de regressão, parâmetros desconhecidos, mas que são fixos,
+e serão estimados com base nas observações de <span
+class="math inline">\(Y\)</span> e dos <span
+class="math inline">\(X\)</span>’s.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>nosso_modelo</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span> <span class='op'>&gt;</span> <span class='fl'>678</span>,
+         <span class='va'>grau_instrucao_apos_2005</span> <span class='op'>!=</span> <span class='st'>'1'</span>,
+         <span class='va'>quantidade_horas_contratadas</span> <span class='op'>&gt;=</span> <span class='fl'>20</span>,
+         <span class='va'>faixa_remuneracao_media_sm</span> <span class='op'>&gt;=</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>log_remuneracao_media <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span> <span class='va'>log_remuneracao_media</span> <span class='op'>~</span> <span class='va'>idade</span> <span class='op'>+</span>
+        <span class='va'>sexo</span> <span class='op'>+</span>
+        <span class='va'>raca_cor</span> <span class='op'>+</span>
+        <span class='va'>sigla_uf</span> <span class='op'>+</span>
+        <span class='va'>grau_instrucao_apos_2005</span> <span class='op'>+</span> 
+        <span class='va'>indicador_portador_deficiencia</span> <span class='op'>+</span>
+        <span class='va'>cbo_2002</span> <span class='op'>+</span>
+        <span class='va'>tamanho_estabelecimento</span>, data <span class='op'>=</span> <span class='va'>.</span><span class='op'>)</span>
+
+<span class='fu'>jtools</span><span class='fu'>::</span><span class='fu'><a href='https://jtools.jacob-long.com/reference/export_summs.html'>export_summs</a></span><span class='op'>(</span><span class='va'>nosso_modelo</span>, model.names <span class='op'>=</span> <span class='st'>'OLS'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>      ──────────────────────────────────────────────────
+                                              OLS       
+                                       ─────────────────
+        (Intercept)                           7.68 ***  
+                                             (0.04)     
+        idade                                 0.02 ***  
+                                             (0.00)     
+        sexo2                                -0.16 ***  
+                                             (0.00)     
+        raca_cor2                            -0.00      
+                                             (0.02)     
+        raca_cor4                            -0.15 ***  
+                                             (0.02)     
+        raca_cor6                             0.12 ***  
+                                             (0.02)     
+        raca_cor8                            -0.11 ***  
+                                             (0.02)     
+        raca_cor9                             0.04 *    
+                                             (0.02)     
+        sigla_ufAL                           -0.27 ***  
+                                             (0.04)     
+        sigla_ufAM                            0.10 **   
+                                             (0.04)     
+        sigla_ufAP                           -0.05      
+                                             (0.05)     
+        sigla_ufBA                           -0.01      
+                                             (0.04)     
+        sigla_ufCE                           -0.11 **   
+                                             (0.04)     
+        sigla_ufDF                            0.22 ***  
+                                             (0.04)     
+        sigla_ufES                           -0.05      
+                                             (0.04)     
+        sigla_ufGO                            0.07 *    
+                                             (0.04)     
+        sigla_ufMA                           -0.22 ***  
+                                             (0.04)     
+        sigla_ufMG                           -0.00      
+                                             (0.04)     
+        sigla_ufMS                           -0.05      
+                                             (0.04)     
+        sigla_ufMT                            0.11 **   
+                                             (0.04)     
+        sigla_ufPA                            0.08 *    
+                                             (0.04)     
+        sigla_ufPB                           -0.36 ***  
+                                             (0.04)     
+        sigla_ufPE                           -0.04      
+                                             (0.04)     
+        sigla_ufPI                           -0.26 ***  
+                                             (0.04)     
+        sigla_ufPR                            0.03      
+                                             (0.04)     
+        sigla_ufRJ                            0.28 ***  
+                                             (0.04)     
+        sigla_ufRN                           -0.45 ***  
+                                             (0.04)     
+        sigla_ufRO                            0.06      
+                                             (0.04)     
+        sigla_ufRR                           -0.06      
+                                             (0.04)     
+        sigla_ufRS                            0.04      
+                                             (0.04)     
+        sigla_ufSC                            0.02      
+                                             (0.04)     
+        sigla_ufSE                           -0.12 **   
+                                             (0.04)     
+        sigla_ufSP                            0.26 ***  
+                                             (0.03)     
+        sigla_ufTO                           -0.13 ***  
+                                             (0.04)     
+        grau_instrucao_apos_200511           -0.00      
+                                             (0.02)     
+        grau_instrucao_apos_20052            -1.07 ***  
+                                             (0.03)     
+        grau_instrucao_apos_20053            -1.22 ***  
+                                             (0.02)     
+        grau_instrucao_apos_20054            -1.09 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20055            -1.05 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20056            -1.02 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20057            -0.82 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20058            -0.51 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20059            -0.25 ***  
+                                             (0.01)     
+        indicador_portador_deficiencia       -0.10 ***  
+                                             (0.01)     
+        cbo_2002211110                        0.08 ***  
+                                             (0.00)     
+        cbo_2002211205                        0.30 ***  
+                                             (0.00)     
+        cbo_2002211210                        0.10 ***  
+                                             (0.01)     
+        cbo_2002211215                        0.11 ***  
+                                             (0.02)     
+        cbo_2002252515                        0.06 ***  
+                                             (0.00)     
+        cbo_2002252525                        0.07 ***  
+                                             (0.00)     
+        cbo_2002411035                        0.15 ***  
+                                             (0.00)     
+        tamanho_estabelecimento10             0.44 ***  
+                                             (0.01)     
+        tamanho_estabelecimento2             -0.12 ***  
+                                             (0.01)     
+        tamanho_estabelecimento3             -0.03 ***  
+                                             (0.01)     
+        tamanho_estabelecimento4              0.02 **   
+                                             (0.01)     
+        tamanho_estabelecimento5              0.08 ***  
+                                             (0.01)     
+        tamanho_estabelecimento6              0.10 ***  
+                                             (0.01)     
+        tamanho_estabelecimento7              0.13 ***  
+                                             (0.01)     
+        tamanho_estabelecimento8              0.26 ***  
+                                             (0.01)     
+        tamanho_estabelecimento9              0.40 ***  
+                                             (0.01)     
+                                       ─────────────────
+        N                                348978         
+        R2                                    0.56      
+      ──────────────────────────────────────────────────
+        *** p &lt; 0.001; ** p &lt; 0.01; * p &lt; 0.05.         </code></pre>
+<p>Column names: names, OLS</p>
+</div>
+<p><strong>Obs: O desvio padrão dos resíduos é : 0.5015</strong></p>
+<p>Para que os resultados dessa regressão possam ser utilizados, alguns
+testes precisam ser executados, com a intenção de se observar se este
+modelo possui todos os pré-requisitos de uma regressão OLS (Mínimos
+Quadrados Ordinários). Abaixo os testes efetuados no modelo executado
+acima:</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span><span class='op'>(</span><span class='va'>nosso_modelo</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># erro tem distribuição normal</span>
+</code></pre>
+</div>
+</details>
+<img src="analise-da-base-rais_files/figure-html5/testes-1.png" width="624" />
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>lmtest</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/lmtest/man/bptest.html'>bptest</a></span><span class='op'>(</span><span class='va'>nosso_modelo</span><span class='op'>)</span>  <span class='co'># o teste sugere heterocedasticidade</span>
+</code></pre>
+</div>
+</details>
+<pre class="bg-warning"><code>
+    studentized Breusch-Pagan test
+
+data:  nosso_modelo
+BP = 17037, df = 59, p-value &lt; 2.2e-16</code></pre>
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>car</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/car/man/vif.html'>vif</a></span><span class='op'>(</span><span class='va'>nosso_modelo</span><span class='op'>)</span> <span class='co'># os valores muito próximos de 1 sugerem a inexistência de multicolinearidade</span>
+</code></pre>
+</div>
+</details>
+<pre class="bg-warning"><code>                                   GVIF Df GVIF^(1/(2*Df))
+idade                          1.282490  1        1.132471
+sexo                           1.089942  1        1.044003
+raca_cor                       1.867024  5        1.064425
+sigla_uf                       2.134179 26        1.014685
+grau_instrucao_apos_2005       1.473981  9        1.021788
+indicador_portador_deficiencia 1.005991  1        1.002991
+cbo_2002                       2.410983  7        1.064877
+tamanho_estabelecimento        1.610995  9        1.026846</code></pre>
+</div>
+<p>O teste <strong>Breusch-Pagan</strong> (no <em>R</em>, bptest) é um
+teste que possui como hipótese nula a homocedasticidade - ou seja, que a
+variância do erro é constante -, e hipótese alternativa, indícios de
+existência de heterocedasticidade. A partir do resultado do teste
+podemos concluir que há indícios de que a variância dos resíduos não é
+constante. Assim, os estimadores gerados anteriormente não são
+eficientes (não apresentam variância mínima), acarretando em erro em
+todas as análises em que forem utilizadas.</p>
+<p>Para correção da heterocedasticidade, será construído um modelo de
+mínimos quadrados ponderados (WLS), que, para obtenção dos estimadores,
+incorpora pesos no ajuste do modelo, de forma a atribuir maior peso a
+observações sujeitas a menor variância.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># calculando os pesos</span>
+<span class='va'>den_wt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>nosso_modelo</span><span class='op'>$</span><span class='va'>residuals</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>nosso_modelo</span><span class='op'>$</span><span class='va'>fitted.values</span><span class='op'>)</span><span class='op'>$</span><span class='va'>fitted.values</span>
+<span class='va'>wt</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>den_wt</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># estimando o modelo de mínimos quadrados ponderados</span>
+<span class='va'>modelo_ponderado</span> <span class='op'>&lt;-</span> <span class='va'>df_microdados_cd</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span> <span class='op'>&gt;</span> <span class='fl'>678</span>,
+         <span class='va'>grau_instrucao_apos_2005</span> <span class='op'>!=</span> <span class='st'>'1'</span>,
+         <span class='va'>quantidade_horas_contratadas</span> <span class='op'>&gt;=</span> <span class='fl'>20</span>,
+         <span class='va'>faixa_remuneracao_media_sm</span> <span class='op'>&gt;=</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>log_remuneracao_media <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>remuneracao_media_defl</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rpkgs.datanovia.com/ggpubr/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>log_remuneracao_media</span> <span class='op'>~</span> <span class='va'>idade</span> <span class='op'>+</span>
+       <span class='va'>sexo</span> <span class='op'>+</span>
+       <span class='va'>raca_cor</span> <span class='op'>+</span>
+       <span class='va'>sigla_uf</span> <span class='op'>+</span>
+       <span class='va'>grau_instrucao_apos_2005</span> <span class='op'>+</span> 
+       <span class='va'>indicador_portador_deficiencia</span> <span class='op'>+</span>
+       <span class='va'>cbo_2002</span> <span class='op'>+</span>
+       <span class='va'>tamanho_estabelecimento</span>, weights <span class='op'>=</span> <span class='va'>wt</span>,
+     data <span class='op'>=</span> <span class='va'>.</span><span class='op'>)</span>
+
+<span class='fu'>jtools</span><span class='fu'>::</span><span class='fu'><a href='https://jtools.jacob-long.com/reference/export_summs.html'>export_summs</a></span><span class='op'>(</span><span class='va'>modelo_ponderado</span>, model.names <span class='op'>=</span> <span class='st'>'WLS'</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>      ──────────────────────────────────────────────────
+                                              WLS       
+                                       ─────────────────
+        (Intercept)                           7.66 ***  
+                                             (0.05)     
+        idade                                 0.02 ***  
+                                             (0.00)     
+        sexo2                                -0.16 ***  
+                                             (0.00)     
+        raca_cor2                             0.01      
+                                             (0.02)     
+        raca_cor4                            -0.15 ***  
+                                             (0.02)     
+        raca_cor6                             0.14 ***  
+                                             (0.02)     
+        raca_cor8                            -0.12 ***  
+                                             (0.02)     
+        raca_cor9                             0.07 ***  
+                                             (0.02)     
+        sigla_ufAL                           -0.36 ***  
+                                             (0.05)     
+        sigla_ufAM                            0.07      
+                                             (0.04)     
+        sigla_ufAP                           -0.08      
+                                             (0.06)     
+        sigla_ufBA                            0.01      
+                                             (0.04)     
+        sigla_ufCE                           -0.10 *    
+                                             (0.04)     
+        sigla_ufDF                            0.24 ***  
+                                             (0.04)     
+        sigla_ufES                           -0.07      
+                                             (0.04)     
+        sigla_ufGO                            0.06      
+                                             (0.04)     
+        sigla_ufMA                           -0.29 ***  
+                                             (0.04)     
+        sigla_ufMG                           -0.02      
+                                             (0.04)     
+        sigla_ufMS                           -0.11 *    
+                                             (0.04)     
+        sigla_ufMT                            0.07      
+                                             (0.04)     
+        sigla_ufPA                            0.08      
+                                             (0.04)     
+        sigla_ufPB                           -0.47 ***  
+                                             (0.04)     
+        sigla_ufPE                           -0.05      
+                                             (0.04)     
+        sigla_ufPI                           -0.33 ***  
+                                             (0.05)     
+        sigla_ufPR                            0.03      
+                                             (0.04)     
+        sigla_ufRJ                            0.28 ***  
+                                             (0.04)     
+        sigla_ufRN                           -0.57 ***  
+                                             (0.04)     
+        sigla_ufRO                            0.03      
+                                             (0.05)     
+        sigla_ufRR                           -0.11 *    
+                                             (0.05)     
+        sigla_ufRS                            0.02      
+                                             (0.04)     
+        sigla_ufSC                           -0.02      
+                                             (0.04)     
+        sigla_ufSE                           -0.10 *    
+                                             (0.04)     
+        sigla_ufSP                            0.24 ***  
+                                             (0.04)     
+        sigla_ufTO                           -0.17 ***  
+                                             (0.05)     
+        grau_instrucao_apos_200511           -0.02      
+                                             (0.01)     
+        grau_instrucao_apos_20052            -1.06 ***  
+                                             (0.03)     
+        grau_instrucao_apos_20053            -1.24 ***  
+                                             (0.03)     
+        grau_instrucao_apos_20054            -1.08 ***  
+                                             (0.02)     
+        grau_instrucao_apos_20055            -1.04 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20056            -1.05 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20057            -0.77 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20058            -0.50 ***  
+                                             (0.01)     
+        grau_instrucao_apos_20059            -0.23 ***  
+                                             (0.01)     
+        indicador_portador_deficiencia       -0.11 ***  
+                                             (0.01)     
+        cbo_2002211110                        0.13 ***  
+                                             (0.00)     
+        cbo_2002211205                        0.35 ***  
+                                             (0.00)     
+        cbo_2002211210                        0.14 ***  
+                                             (0.01)     
+        cbo_2002211215                        0.14 ***  
+                                             (0.02)     
+        cbo_2002252515                        0.10 ***  
+                                             (0.00)     
+        cbo_2002252525                        0.11 ***  
+                                             (0.00)     
+        cbo_2002411035                        0.23 ***  
+                                             (0.00)     
+        tamanho_estabelecimento10             0.45 ***  
+                                             (0.01)     
+        tamanho_estabelecimento2             -0.15 ***  
+                                             (0.01)     
+        tamanho_estabelecimento3             -0.05 ***  
+                                             (0.01)     
+        tamanho_estabelecimento4              0.01      
+                                             (0.01)     
+        tamanho_estabelecimento5              0.08 ***  
+                                             (0.01)     
+        tamanho_estabelecimento6              0.10 ***  
+                                             (0.01)     
+        tamanho_estabelecimento7              0.15 ***  
+                                             (0.01)     
+        tamanho_estabelecimento8              0.28 ***  
+                                             (0.01)     
+        tamanho_estabelecimento9              0.41 ***  
+                                             (0.01)     
+                                       ─────────────────
+        N                                348978         
+        R2                                    0.54      
+      ──────────────────────────────────────────────────
+        *** p &lt; 0.001; ** p &lt; 0.01; * p &lt; 0.05.         </code></pre>
+<p>Column names: names, WLS</p>
+</div>
+<p><strong>Obs: O desvio padrão dos resíduos é : 0.08913</strong></p>
+<p>Com isto, temos agora um modelo que corrige a heterocedasticidade
+observada anteriormente, apresentando estimadores que possuem a menor
+variância e, também, possibilitando a estimativa de intervalos de
+confiança e teste de hipóteses que não são incorretos.</p>
+<p>Os resultados dessa regressão identificam que, em média, no mercado
+de ciência de dados, uma mulher recebe <span class="math inline">\(1 -
+exp^{-0.1551} = 1 - 0.8563 = 0.14367\)</span> ou <span
+class="math inline">\(14,37\%\)</span> menos do que um homem que possui
+exatamente as mesmas características que ela, exceto o sexo. Outra
+comparação que pode ser feita é em relação ao grau de instrução, com
+trabalhadores que possuem o ensino médio completo recebendo, em média,
+cerca de <span class="math inline">\(1 - exp^{-0.7817} = 1 - 0.4576 =
+0.54237\)</span> ou <span class="math inline">\(54,24\%\)</span> menos
+do que o recebido por um trabalhador com título de Mestre, tal fato pode
+se dar pelo fato de que pessoas com melhores currículos estejam ocupando
+cargos mais altos e, consequentemente, com salários maiores.</p>
+<h2 id="conclusões">Conclusões</h2>
+<p>Esta análise tentou observar um pouco do mundo dos cientistas de
+dados, pela ótica dos seus rendimentos, sendo observado logo no início a
+dificuldade de se classificar corretamente os profissionais dessa área,
+uma vez que é ainda é um cargo que pode ser classificado de diversas
+formas na CBO.</p>
+<p>Os salários desses profissionais variam muito a depender da regiãodo
+país, algumas áreas possuem salários relativamente maiores do que
+outros, podendo ser uma indicação de mercados mais desenvolvidos em
+certos estados, enquanto em outros esta área ainda é pouco desenvolvida.
+Outros fatores observados foram as diferenças de sexo, raça/cor e grau
+de instrução.</p>
+<p>Por último, a análise recorreu ao estudo da dependência da variável
+dependente, o salário dos cientistas de dados, em relação a um grupo de
+variáveis, através de um modelo de regressão linear, observando o
+diferencial salarial entre indivíduos que possuem diversas
+caracteríscas.</p>
+<div class="sourceCode" id="cb5"><pre
 class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
@@ -1501,6 +5492,15 @@ class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"><
 <div class="d-appendix">
 </div>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->

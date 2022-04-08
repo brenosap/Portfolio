@@ -13,13 +13,531 @@ output:
     code_folding: true
 ---
 
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = TRUE,
+                      message = TRUE,
+                      class.source = 'bg-danger',
+                      class.output = 'bg-warning')
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web.
+# Quanto ganha um cientista de dados baseado nas informações disponíveis na RAIS ?
 
-Learn more about using Distill at <https://rstudio.github.io/distill>.
+## Acessando os dados da RAIS
+
+De forma inicial, iremos chamar os pacotes necessários na análise de todo o projeto.
+
+```{r pacotes, message=FALSE, warning=FALSE}
+library(bigrquery)
+library(tidyverse)
+library(ggpubr)
+library(kableExtra)
+#library(gtsummary)
+library(forcats)
+library(sidrar)
+library(deflateBR)
+library(scales)
+library(jtools)
+```
+
+Vamos utilizar o [datalake da iniciativa Base dos Dados](https://basedosdados.org).
+
+```{r author, include = FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+bigrquery::bq_auth('breno.pereira@academico.ufpb.br')
+
+conexao <- dbConnect(
+  bigquery(),
+  project = 'basedosdados',
+  dataset = 'br_me_rais',
+  billing = 'curso-r-dsp',
+)
+```
+
+```{r conexao, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+#Abaixo está o código que carrega as primeiras 5 linhas da tabela de microdados.
+
+primeiras_5 <-  tbl(conexao, 'microdados_vinculos') %>% 
+  select(everything()) %>% 
+  head(5) %>% 
+  collect()
+
+kbl(primeiras_5) %>% 
+  kable_paper() %>% 
+  scroll_box(width = '100%')
+
+```
+
+Neste banco de dados estão disponíveis informações sobre o ano da admissão ou desligamento do funcionário, além de identificar o município e estado destas ocorrências a nível individual, entretanto, não é possível identificar quem são esses pessoas. Outros elementos disponíveis estão relacionados com o valor de remuneração do trabalhador e a área em que este trabalho ocorre, identificando características como o setor da empresa (através do código da CNAE) e o tamanho do estabelecimento (pelo número de empregados).
+
+Os dados analisados neste projeto referencem às pessoas que (potencialmente) trabalham com ciência de dados. **Por que "potencialmente" ?** Existe um Código Brasileiro de Ocupações (CBO), que tem um cadastro de todas as ocupações formais no Brasil, entretanto o Cientista de Dados ainda não está classificado formalmente na CBO, por ser uma classificação ainda muito recente. Para contornar esse problema, serão utilizados alguns códigos da CBO que são relacionados a ciência de dados e filtrar da RAIS para obter os dados dessas pessoas, apontados a seguir:
+
+- 1311-20 -> Gerente de serviços sociais (chefe de pesquisa e estatística);
+- 2111-10 -> Especialista em pesquisa operacional;
+- 2112-05 -> Estatístico (analista);
+- 2112-10 -> Estatístico (estatística aplicada);
+- 2112-15 -> Estatístico (teórico);
+- 2525-15 -> Analista de cobrança (instituições financeiras);
+- 2525-25 -> Analista de crédito (instituições financeiras);
+- 4110-35 -> Auxiliar de estatística.
+
+Assim, queremos identificar **qual o salário de quem trabalha com ciência de dados** e algumas especificações dessa área, como locais com maiores salários médios e ocupações em que o cientista de dados possua maior remuneração.
+
+```{r cbo, message=FALSE, warning=FALSE}
+codigos_cbo <- c( "252515", "252525", "211110", 
+                  # pesquisa/cientista 
+                  "211205", "211210","411035",
+                  "131120","211215" 
+                  # ocupações estatísticas
+                  )
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+# cd = cientista de dados
+microdados_cd_tbl <- tbl(conexao, 'microdados_vinculos') %>% 
+  select(everything()) %>% 
+  filter(
+    ano >= 2013,
+    cbo_2002 %in% codigos_cbo
+  ) %>% 
+  head(5000)
+
+df_microdados_cd <- collect(microdados_cd_tbl)                  
+
+```
+
+Agora vamos carregar a base de dados da RAIS das ocupações que estão relacionadas à ciência de dados em sua totalidade a partir do ano 2013.
+
+```{r microdados, echo=TRUE, message=FALSE, warning=FALSE}
+microdados_cd_tbl <- tbl(conexao, 'microdados_vinculos') %>% 
+  select(everything()) %>% 
+  filter(
+    ano >= 2013,
+    cbo_2002 %in% codigos_cbo
+  )
+
+df_microdados_cd <- collect(microdados_cd_tbl)
+
+# Deflacionando os valores da remuneração média (ano base = 2019)
+df_microdados_cd <- df_microdados_cd %>% 
+  dplyr::mutate(dates = as.Date(as.character(df_microdados_cd$ano), 
+                         format = '%Y'),
+         remuneracao_media_defl = deflate(valor_remuneracao_media,
+                                          dates,
+                                          real_date = '12/2019',
+                                          index = 'ipca'))
+
+df_microdados_cd %>% 
+  head(10) %>%
+  kbl(caption = 'Exemplo dos microdados - 10 primeiras observações da lista') %>% 
+  kable_paper() %>% 
+  scroll_box(height = '300px')
+```
 
 
+Da tabela acima, identifica-se um trabalhador do sexo `r ifelse(df_microdados_cd$sexo[1] == 1, 'masculino', 'feminino')` (sexo = `r df_microdados_cd$sexo[1]`), na área de auxiliar de estatística e com uma remuneração média de R\$ `r format(df_microdados_cd$valor_remuneracao_media[1], big.mark = '.', decimal.mark=',')` para um total de `r format(nrow(df_microdados_cd), big.mark='.')` observações.
+
+Em posse de informações como esta podemos avançar na análise dos salários dos cientistas de dados desde 2013. Nó tópico a seguir serão apresentados questionamentos adicionais que possam auxiliar na questão de quanto recebe uma pessoa que trabalha com **Ciência de Dados** ?
+
+## Perguntas de pesquisa
+
+1.   Quanto o salário médio varia no tempo?
+
+1.   Quanto o salário médio varia regionalmente?
+
+1.   Quanto o salário médio varia por característica das pessoas?
+    -   Gênero
+    -   Raça/Cor
+    -   Grau de instrução
+
+```{r comentario, eval=FALSE, include=FALSE}
+1.   **[Desafio]** Qual cargo tem a maior taxa de crescimento dentro daquele setor da economia (CNAE) proporcionalmente a municípios com mais pessoas empregadas naquela CBO ?
+```
+
+
+
+### Como variam os salários médios no tempo?
+
+```{r ano, }
+
+df_ano <- df_microdados_cd %>% 
+  group_by(ano) %>% 
+  summarise(media_ano = mean(remuneracao_media_defl),
+            mediana_ano = median(remuneracao_media_defl))
+
+ggplot(df_ano, aes(x = ano, y = media_ano))+
+  geom_col(fill = 'steelblue4')+
+  geom_text(aes(label = format(media_ano,
+                               nsmall = 2,
+                               digits = 1,
+                               big.mark = '.',
+                               decimal.mark = ','),
+                vjust = -0.3))+
+  labs(x = 'Ano', y = 'Média Salarial (R$)', title = 'Média salarial a preços constantes (ano base: 2019)')+
+  scale_y_continuous(limits = c(0,6000))+
+  scale_x_continuous(breaks = 2013:2019)+
+  theme_minimal()+
+  theme(panel.grid.major.x = element_blank(),
+        axis.title = element_text(vjust = 1.1, hjust = 1))
+```
+
+Identifica-se que, observando apenas o crescimento da remuneração média ao longo dos anos, houve um pico salarial no ano de 2017, atingindo R\$ `r format(max(df_ano$media_ano), nsmall = 2, digits = 1, big.mark='.')`. Assim, constata-se que, de forma geral, o salário médio do cientista de dados (a preços constantes de 2019) se mantém em cerca de R$ 5.000,00.
+
+Como no mercado de trabalho pode existir algumas poucas remunerações que são bem diferentes das demais (as observações *outliers*), vamos observar a mediana das remunerações, com o intuito de identificar algum indício de que exista distorção na distribuição das remunerações, uma vez que a mediana representa o valor numérico que separa a metade superior de um conjunto de sua metade inferior.
+
+```{r grafico_mediana, }
+
+ggplot(df_ano, aes(x = ano, y = mediana_ano))+
+  geom_col(fill = 'steelblue4')+
+  geom_text(aes(label = format(mediana_ano,
+                               nsmall = 2,
+                               digits = 1,
+                               big.mark = '.',
+                               decimal.mark = ','),
+                vjust = -0.3))+
+  labs(x = 'Ano', y = 'Mediana Salarial (R$)', title = 'Mediana salarial a preços constantes (ano base: 2019)')+
+  scale_y_continuous(limits = c(0,6000))+
+  scale_x_continuous(breaks = 2013:2019)+
+  theme_minimal()+
+  theme(panel.grid.major.x = element_blank(),
+        axis.title = element_text(vjust = 1.1, hjust = 1))
+```
+
+Deste gráfico, podemos identificar que a mediana do conjunto de remunerações é relativamente menor do que os valores observado na média das remunerações, entretanto, com o passar do tempo a mediana salarial aumentou mais do que o observado com a média salarial, dando evidências de que mesmo havendo distorção salarial e excluindo o efeito de valores *outliers*, houve um aumento significativo na renda do cientista de dados (`r label_percent()(df_ano$mediana_ano[7]/df_ano$mediana_ano[1] - 1)`, no ano de 2019 em relação a 2013, já excluindo o efeito da inflação).
+
+Esta distorção salarial pode estar relacionada, entre outros fatores, ao fato de que os códigos da CBO não identificam nenhuma hierarquia de cargo, não podendo se diferenciar nesta base de dados, por exemplo, um cientista de dados júnior de um cientista de dados pleno ou sênior. 
+
+Além disso, pode haver distorções entre os códigos da CBO utilizados, com algumas ocupações sendo mais bem remuneradas do que outras (caso que será estudado mais adiante), assim como, diferenças regionais, próxima hipótese a ser estudada.
+
+
+```{r tabela_ano}
+df_ano %>% 
+  kbl(digits = 2, caption = 'Média e mediana salarial por ano a preços constantes (ano base = 2019)') %>% 
+  kable_paper()
+```
+
+
+
+### Quanto o salário varia regionalmente?
+
+```{r tabela_uf,}
+
+df_uf <- df_microdados_cd %>% 
+  group_by(sigla_uf) %>% 
+  summarise(media_uf = mean(remuneracao_media_defl),
+            mediana_uf = median(remuneracao_media_defl))
+
+df_uf %>% 
+  kbl(caption = 'Média e mediana do salário por Unidade da Federação') %>% 
+  kable_paper() %>% 
+  scroll_box(height = '200px')
+
+```
+
+Através de um gráfico, abaixo, podemos identificar mais facilmente que o Rio de Janeiro, Distrito Federal e São Paulo possuem as maiores remunerações médias e medianas. Com estes 2 gráficos pode-se perceber uma grande disparidade salarial entre algumas localidades, sendo observado salários médios de R\$ `r format(max(df_uf$media_uf), nsmall = 2, digits = 1)` e R\$ `r format(sort(df_uf$media_uf, TRUE)[2], nsmall = 2, digits = 1)`, no RJ e DF, respectivamente, enquanto que no Piauí e Maranhão, os salários médios foram de R\$ `r format(sort(df_uf$media_uf)[2], nsmall = 2, digits = 1)` e R\$ `r format(sort(df_uf$media_uf)[1], nsmall = 2, digits = 1)`, respectivamente.
+
+
+```{r grafico_uf}
+g1 <- df_uf %>% 
+  dplyr::mutate(
+    sigla_uf = fct_reorder(sigla_uf, media_uf)
+  ) %>% 
+  ggplot(aes(y = sigla_uf, x = media_uf))+
+  geom_col(fill = 'steelblue4')+
+  labs(y = 'Unidade da Federação', x = 'Média Salarial (R$)',
+       title = 'Media salarial por UF')+
+  scale_x_continuous(limits = c(0,10000), breaks = seq(0,12000,2000))+
+  theme_minimal()+
+  theme(panel.grid.major.y = element_blank(),
+        axis.title = element_text(vjust = 1.1, hjust = 1))
+
+g2 <- df_uf %>% 
+  dplyr::mutate(
+    sigla_uf = fct_reorder(sigla_uf, mediana_uf)
+  ) %>% 
+  ggplot(aes(x = mediana_uf, y = sigla_uf))+
+  geom_col(fill = 'steelblue4')+
+  labs(y = 'Unidade da Federação', x = 'Mediana Salarial (R$)',
+       title = 'Mediana salarial por UF')+
+  scale_x_continuous(limits = c(0,10000), breaks = seq(0,12000,2000))+
+  theme_minimal()+
+  theme(panel.grid.major.y = element_blank(),
+        axis.title = element_text(vjust = 1.1, hjust = 1))
+
+ggarrange(g1, g2)
+```
+
+Diferentemente dos demais estados, a mediana salarial no RJ é maior do que sua média salarial, pode-se concluir que no Rio os valoresde salário na parte de baixo da distribuição estão muito distantes do centro, em comparação aos valores que estão no topo desta distribuição, ou seja, pode-se concluir que no RJ os salários dos cientistas de dados são bastante elevados quando comparados com a média nacional e dos demais estados.
+
+Ao se identificar tamanha disparidade salarial entre alguns estados, demanda observar se esta diferença pode estar relacionada a um mercado mais estruturado em determinadas localidades, justificando maiores salários em algumas regiões. Porém, este será apenas um exercício para projetos futuros. 
+
+### Os salário variam por sexo?
+
+De forma inicial, destaca-se que existe um número maior de mulheres (sexo = 2) empregadas neste setor, correspondendo a `r label_percent()(198347/(198347+148193))` dos trabalhadores que fazem parte das ocupações selecionadas anteriormente.
+
+```{r} 
+df_microdados_cd %>% 
+  dplyr::group_by(sexo) %>% 
+  summarise(soma = n()) %>% 
+  kbl(caption = 'Quantidade de homens e mulheres ocupados nestes setor') %>% 
+  kable_paper()
+```
+
+Ao considerar as diversas ocupações (atentar para as escalas de cada gráfico), percebe-se que existe uma heterogeneidade na ocupação de cada código do CBO, com os homens sendo maioria nas áreas de Especialista em pesquisa operacional (2111-10), Estatístico - analista (2112-05) e Auxiliar de estatística (4110-35). Já as mulheres são maioria expressiva nas ocupações de Gerente de serrviços sociais - chefes de pesquisa e estatística (1311-20), Estatística aplicada (2112-10), Analista de cobrança e de crédito, 2525-15 e 2525-25, respectivamente. 
+
+
+```{r resumo_sexo, message=FALSE, warning=FALSE}
+resumo_sexo <- df_microdados_cd %>% 
+  dplyr::group_by(cbo_2002, sexo) %>% 
+  summarise(soma = n())
+
+resumo_sexo %>% 
+  ggplot(aes(x = sexo, y = soma, fill = sexo))+
+  geom_col(position = 'dodge')+
+  geom_text(aes(label = soma),
+            vjust = 1.2,
+            color = ifelse(resumo_sexo$sexo == '1', 'black', 'white'),
+            position = position_dodge(width = 0.9))+
+  labs(x='', y='',
+       title = 'Número de trabalhadores por CBO')+
+  scale_x_discrete(labels = c('Masculino', 'Feminino'))+
+  scale_fill_manual(values = c("#CFAA3D", "#85898C"))+
+  theme_minimal()+
+  theme(legend.position = 'None')+
+  facet_wrap(~cbo_2002, scales = 'free')
+  
+```
+
+Visto como se dão as ocupações do mercado de trabalho em relação ao sexo, vamos agora observar como os rendimentos estão dispostos. Inicialmente, será analisado o mercado de ciências de dados de forma mais geral, posteriormente, serão destacados os rendimentos por tipo de ocupação, com o intuito de observar se existe diferencial salarial entre as diversas áreas da ciências de dados.
+
+```{r salario_sexo, message=FALSE, warning=FALSE}
+salario_sexo <- df_microdados_cd %>% 
+  dplyr::group_by(cbo_2002, sexo) %>% 
+  summarise(media_sexo = mean(remuneracao_media_defl),
+            mediana_sexo = median(remuneracao_media_defl))
+
+salario_sexo %>% 
+  kbl(caption = 'Média e Mediana do salário por sexo e CBO') %>% 
+  kable_paper() %>% 
+  scroll_box(height = '200px')
+```
+
+```{r message=FALSE, warning=FALSE}
+
+salario_sexo %>% 
+  ggplot(aes(x = cbo_2002, y = media_sexo, fill = sexo))+
+  geom_col(position = 'dodge')+
+  theme_minimal()+
+  scale_fill_manual(values = c("#CFAA3D", "#85898C"),
+                       labels = c('Masculino', 'Feminino'))+
+  labs(y = 'Remuneração média (R$)', x = 'Códigos CBO',
+       fill = 'Sexo', title = 'Média das remunerações')+
+  theme(axis.title = element_text(hjust = 1, vjust = 1))
+```
+A partir do gráfico acima é possível identificar alguns padrões quanto a remuneração. O primeiro, é de que todos os setores possuem um diferencial salarial entre os sexos, um segundo padrão é de que as remunerações do categoria 2112-05 (Estatístico - analista) são bem mais elevadas do que a média das remunerações, independente do sexo do trabalhador.
+
+Já ao se observar a mediana dos salários, é possível identificar que na categoria de auxiliar de estatística (4110-35) há um diferencial ainda maior do que o observado nas médias salariais. Situação inversa ocorre na classificação de chefe de pesquisa e estatística (1311-20), em que é possível observar que a maior parte da população feminina ocupada neste setor recebe uma remuneração pouco maior do que a população masculina.  
+
+```{r}
+
+salario_sexo %>% 
+  ggplot(aes(x = cbo_2002, y = mediana_sexo, fill = sexo))+
+  geom_col(position = 'dodge')+
+  theme_minimal()+
+  scale_fill_manual(values = c("#CFAA3D", "#85898C"),
+                       labels = c('Masculino', 'Feminino'))+
+  labs(y = 'Remuneração média (R$)', x = 'Códigos CBO',
+       fill = 'Sexo', title = 'Mediana das remunerações')+
+  theme(axis.title = element_text(hjust = 1, vjust = 1))
+```
+
+### Os salários variam por etnia ?
+
+É possível identificar que a raça/cor amarela possui, em média, os maiores salários, independete do sexo do trabalhador e, do outro lado, trabalhadores de raça/cor parda e negra possuem as menores remunerações médias, sendo necessário identificar, ainda, quais as possíveis causas dessas disparidades.
+
+```{r message=FALSE, warning=FALSE}
+
+resumo_etnia <- df_microdados_cd %>% 
+  group_by(raca_cor, sexo) %>% 
+  summarise(
+    media = mean(valor_remuneracao_media),
+    mediana = median(valor_remuneracao_media)
+  )
+
+resumo_etnia %>% 
+  ggplot(aes(x = raca_cor, y = media, fill = sexo))+
+  geom_col(position = 'dodge')+
+  geom_text(aes(label = format(media, 
+                               big.mark = '.', 
+                               digits = 1)),
+            vjust = -0.3,
+            position = position_dodge(width = 0.9))+
+  labs(y = '(R$)', x = 'Raça/Cor', title = 'Remuneração média por raça/cor para cada sexo')+
+  scale_y_continuous(limits = c(0,8500))+
+  scale_fill_manual(values = c("#CFAA3D", "#85898C"),
+                       labels = c('Masculino', 'Feminino'))+
+  scale_x_discrete(labels = c('Indígena', 'Branca', 'Preta',
+                            'Amarela', 'Parda', 'Não identificada'))+
+  theme_minimal()+
+  theme(legend.position = 'bottom',
+        legend.title = element_blank(),
+        panel.grid.major.x = element_blank(), 
+        axis.title = element_text(vjust = 1.1, hjust = 1))
+```
+
+### Os salários variam por grau de instrução ?
+
+Para se tornar cientista de dados não é necessário ensino superior, entretanto, algumas colocações podem exigir este nível de instrução. Entre as pessoas que estão ocupadas nas classificações citadas anteriormente da CBO, `r label_percent()((175033+4581+1090)/346540)` possuem pelo menos um título de graduação. 
+
+```{r resumo_escolaridade, message=FALSE, warning=FALSE}
+resumo_escolar <- df_microdados_cd %>% 
+  dplyr::group_by(grau_instrucao_apos_2005) %>% 
+  dplyr::mutate(grau_instrucao_apos_2005 = factor(grau_instrucao_apos_2005,
+                                           levels = c('1', '2', '3', '4',
+                                                      '5', '6', '7', '8',
+                                                      '9', '10', '11'))) %>% 
+  summarise(qtd = n(),
+            media_escolar = mean(remuneracao_media_defl),
+            mediana_escolar = median(remuneracao_media_defl))
+
+resumo_escolar %>% 
+  ggplot(aes(x = qtd, y = grau_instrucao_apos_2005))+
+  geom_col(fill = 'steelblue3') +
+  geom_text(aes(label = qtd), hjust = ifelse(resumo_escolar$qtd > 150000,
+                                             1.1,
+                                             -0.2))+
+  theme_minimal()+
+  labs(x = 'Quantidade', 
+       y='', 
+       title = 'Número de possíveis cientistas de dados por escolaridade')+
+  scale_y_discrete(labels = c('Analfabeto', 'Até 5.A Inc.', '5.A Comp. Fund', 
+                              '6. A 9. Fund', 'Fund. Comp.', 'Médio Inc.',
+                              'Médio Comp.', 'Sup. Inc.', 'Sup. Comp.',
+                              'Mestrado', 'Doutorado'))+
+  theme(axis.title = element_text(hjust = 1, vjust = 1),
+        panel.grid.major.y = element_blank())
+```
+
+Em relação ao salário, o gráifco abaixo identifica valores inesperados nos salários dos indivíduos que são analfabetos, registrando valores similares aos que possuem ensino superior completo, esta informação inesperada pode ser devido à dados informados incorretamente na coleta.
+
+```{r salario_escolaridade, message=FALSE, warning=FALSE}
+resumo_escolar %>%
+  select(!qtd) %>% 
+  pivot_longer(!grau_instrucao_apos_2005,
+               names_to = 'tipo',
+               values_to = 'salario') %>% 
+  ggplot(aes(y = salario, x = grau_instrucao_apos_2005, fill = tipo))+
+  geom_col(position = 'dodge')+
+  labs(x = '', y='Salário (R$)',
+       title = 'Média e mediana dos salários por escolaridade')+
+  scale_x_discrete(labels = c('Analfabeto', 'Até 5.A\nInc.', '5.A Comp.\nFund', 
+                              '6. A 9.\nFund', 'Fund.\nComp.', 'Médio\nInc.',
+                              'Médio\nComp.', 'Sup.\nInc.', 'Sup.\nComp.',
+                              'Mestrado', 'Doutorado'))+
+  scale_y_continuous(breaks = seq(0,14000, 2000))+
+  scale_fill_manual(values = c("#CFAA3D", "#85898C"),
+                       labels = c('Média', 'Mediana'))+
+  theme_minimal()+
+  theme(axis.title = element_text(hjust = 1, vjust = 1),
+        panel.grid.major.x = element_blank(),
+        legend.position = 'bottom',
+        legend.title = element_blank())
+```
+
+Outra informação que pode ser retirarda deste gráfico é a correlação positiva entre os anos de escolaridade e o salário (tanto médio quanto mediano), fato que pode estar relacionado com o fato de que funcionários com maior nível de escolaridade possam alcançar posições mais importantes dentro de uma empresa e, consequentemente, maiores remunerações.
+
+## Regressão Linear
+
+A análise de regressão diz respeito ao estudo da dependência de uma variável, a *variável dependente*, em relação a uma ou mais variáveis, as *variáveis explicativas*, com a finalidade de estimar e/ou prever o valor médio da variável dependente em termos dos valores conhecidos ou fixados das variáveis explanatórias. Assim, para o nosso caso - e considerando algumas simplificações - através da regressão linear podemos prever a remuneração média de um cientista de dados a partir do conhecimento de outras variáveis, como o sexo, a idade, a cor/raça, a quantidade de horas trabalhadas e o grau de escolaridade da pessoa.
+
+Esta regressão linear utilizada pode ser representada por:
+
+$$
+Y_{i} = \beta_{1} + \beta_{2}X_{2i} + ... +\beta_{n}X_{ni} + u_{i}
+$$
+Em que as variáveis $X_{2i}$ até $X_{ni}$ são as variáveis explicativas do modelo. Os $\beta$'s representam os coeficientes de regressão, parâmetros desconhecidos, mas que são fixos, e serão estimados com base nas observações de $Y$ e dos $X$'s.
+
+```{r eval=FALSE, include=FALSE}
+### Qual a distribuição dos salários da base?
+df_microdados_cd %>% 
+  filter(remuneracao_media_defl > 0, 
+         quantidade_horas_contratadas >= 20) %>%
+  ggplot(aes(x = log(remuneracao_media_defl)))+
+  geom_histogram(bins = 20) +
+  facet_wrap(~cbo_2002, scales = 'free')
+```
+
+```{r regressao_ols, message=FALSE, warning=FALSE}
+
+nosso_modelo <- df_microdados_cd %>% 
+  filter(remuneracao_media_defl > 678,
+         grau_instrucao_apos_2005 != '1',
+         quantidade_horas_contratadas >= 20,
+         faixa_remuneracao_media_sm >= 2) %>% 
+  dplyr::mutate(log_remuneracao_media = log(remuneracao_media_defl)) %>% 
+  lm( log_remuneracao_media ~ idade +
+        sexo +
+        raca_cor +
+        sigla_uf +
+        grau_instrucao_apos_2005 + 
+        indicador_portador_deficiencia +
+        cbo_2002 +
+        tamanho_estabelecimento, data = .)
+
+jtools::export_summs(nosso_modelo, model.names = 'OLS')
+```
+
+**Obs: O desvio padrão dos resíduos é : `r format(sd(nosso_modelo$residuals), digits = 4)`**
+
+Para que os resultados dessa regressão possam ser utilizados, alguns testes precisam ser executados, com a intenção de se observar se este modelo possui todos os pré-requisitos de uma regressão OLS (Mínimos Quadrados Ordinários). Abaixo os testes efetuados no modelo executado acima:
+
+```{r testes}
+hist(residuals(nosso_modelo)) # erro tem distribuição normal
+
+lmtest::bptest(nosso_modelo)  # o teste sugere heterocedasticidade
+
+car::vif(nosso_modelo) # os valores muito próximos de 1 sugerem a inexistência de multicolinearidade
+```
+O teste **Breusch-Pagan** (no *R*, bptest) é um teste que possui como hipótese nula a homocedasticidade - ou seja, que a variância do erro é constante -, e hipótese alternativa, indícios de existência de heterocedasticidade. A partir do resultado do teste podemos concluir que há indícios de que a variância dos resíduos não é constante. Assim, os estimadores gerados anteriormente não são eficientes (não apresentam variância mínima), acarretando em erro em todas as análises em que forem utilizadas.
+
+Para correção da heterocedasticidade, será construído um modelo de mínimos quadrados ponderados (WLS), que, para obtenção dos estimadores, incorpora pesos no ajuste do modelo, de forma a atribuir maior peso a observações sujeitas a menor variância.
+
+```{r regressao_wls, echo=TRUE, message=FALSE, warning=FALSE, results='asis'}
+# calculando os pesos
+den_wt <- lm(log(nosso_modelo$residuals^2) ~ nosso_modelo$fitted.values)$fitted.values
+wt <- 1 / sqrt(exp(den_wt^2))
+
+# estimando o modelo de mínimos quadrados ponderados
+modelo_ponderado <- df_microdados_cd %>% 
+  filter(remuneracao_media_defl > 678,
+         grau_instrucao_apos_2005 != '1',
+         quantidade_horas_contratadas >= 20,
+         faixa_remuneracao_media_sm >= 2) %>% 
+  dplyr::mutate(log_remuneracao_media = log(remuneracao_media_defl)) %>% 
+  lm(log_remuneracao_media ~ idade +
+       sexo +
+       raca_cor +
+       sigla_uf +
+       grau_instrucao_apos_2005 + 
+       indicador_portador_deficiencia +
+       cbo_2002 +
+       tamanho_estabelecimento, weights = wt,
+     data = .)
+
+jtools::export_summs(modelo_ponderado, model.names = 'WLS')
+```
+
+**Obs: O desvio padrão dos resíduos é : `r format(sd(summary(modelo_ponderado)$residuals), digits = 4)`**
+
+Com isto, temos agora um modelo que corrige a heterocedasticidade observada anteriormente, apresentando estimadores que possuem a menor variância e, também, possibilitando a estimativa de intervalos de confiança e teste de hipóteses que não são incorretos.
+
+Os resultados dessa regressão identificam que, em média, no mercado de ciência de dados, uma mulher recebe $1 - exp^{-0.1551} = 1 - 0.8563 = 0.14367$ ou $14,37\%$ menos do que um homem que possui exatamente as mesmas características que ela, exceto o sexo. Outra comparação que pode ser feita é em relação ao grau de instrução, com trabalhadores que possuem o ensino médio completo recebendo, em média, cerca de  $1 - exp^{-0.7817} = 1 - 0.4576 = 0.54237$ ou $54,24\%$ menos do que o recebido por um trabalhador com título de Mestre, tal fato pode se dar pelo fato de que pessoas com melhores currículos estejam ocupando cargos mais altos e, consequentemente, com salários maiores. 
+
+## Conclusões
+
+Esta análise tentou observar um pouco do mundo dos cientistas de dados, pela ótica dos seus rendimentos, sendo observado logo no início a dificuldade de se classificar corretamente os profissionais dessa área, uma vez que é ainda é um cargo que pode ser classificado de diversas formas na CBO.
+
+Os salários desses profissionais variam muito a depender da regiãodo país, algumas áreas possuem salários relativamente maiores do que outros, podendo ser uma indicação de mercados mais desenvolvidos em certos estados, enquanto em outros esta área ainda é pouco desenvolvida. Outros fatores observados foram as diferenças de sexo, raça/cor e grau de instrução.
+
+Por último, a análise recorreu ao estudo da dependência da variável dependente, o salário dos cientistas de dados, em relação a um grupo de variáveis, através de um modelo de regressão linear, observando o diferencial salarial entre indivíduos que possuem diversas caracteríscas.

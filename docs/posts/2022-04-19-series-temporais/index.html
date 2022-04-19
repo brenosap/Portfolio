@@ -118,7 +118,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["series-temporais_files/figure-html5/unnamed-chunk-1-1.png"]}
+  {"type":"character","attributes":{},"value":["series-temporais_files/anchor-4.2.2/anchor.min.js","series-temporais_files/bowser-1.9.3/bowser.min.js","series-temporais_files/distill-2.2.21/template.v2.js","series-temporais_files/figure-html5/unnamed-chunk-1-1.png","series-temporais_files/figure-html5/unnamed-chunk-11-1.png","series-temporais_files/figure-html5/unnamed-chunk-13-1.png","series-temporais_files/figure-html5/unnamed-chunk-14-1.png","series-temporais_files/figure-html5/unnamed-chunk-3-1.png","series-temporais_files/figure-html5/unnamed-chunk-5-1.png","series-temporais_files/figure-html5/unnamed-chunk-7-1.png","series-temporais_files/figure-html5/unnamed-chunk-9-1.png","series-temporais_files/header-attrs-2.11/header-attrs.js","series-temporais_files/jquery-3.6.0/jquery-3.6.0.js","series-temporais_files/jquery-3.6.0/jquery-3.6.0.min.js","series-temporais_files/jquery-3.6.0/jquery-3.6.0.min.map","series-temporais_files/popper-2.6.0/popper.min.js","series-temporais_files/tippy-6.2.7/tippy-bundle.umd.min.js","series-temporais_files/tippy-6.2.7/tippy-light-border.css","series-temporais_files/tippy-6.2.7/tippy.css","series-temporais_files/tippy-6.2.7/tippy.umd.min.js","series-temporais_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -2133,7 +2133,7 @@ anteriores.</p></li>
 previsões (em inglês, <em>ensenmble forecasting</em>) podem apresentar
 resultados mais precisos do que as previsões dos modelos em separado.
 Como forma de estudar este teoria, neste post será abordado a combinação
-de modelos de previsões atráves do pacote do <strong>R</strong> <a
+de modelos de previsões atráves do pacote do <strong>R</strong>, <a
 href="https://github.com/ellisp/forecastHybrid">forecastHybrid</a>.</p>
 <p>A série de tempo utilizada será a Arrecadação federal, que é a soma
 das receitas administradas pela Receita Federal com as receitas
@@ -2166,7 +2166,443 @@ Econômica Aplicada (IPEA).</p>
 <p><img src="series-temporais_files/figure-html5/unnamed-chunk-1-1.png" width="624" /></p>
 </div>
 <h2 id="amostras-de-treino-e-teste">Amostras de treino e teste</h2>
-<div class="sourceCode" id="cb1"><pre
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>split</span> <span class='op'>&lt;-</span> <span class='fu'>TSstudio</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/TSstudio/man/ts_split.html'>ts_split</a></span><span class='op'>(</span>ts.obj <span class='op'>=</span> <span class='va'>arrecadacao_ts</span>, sample.out <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>
+
+<span class='va'>treino_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>train</span>
+<span class='va'>teste_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>test</span>
+</code></pre>
+</div>
+</div>
+<h1 id="snaive">SNAIVE</h1>
+<p>Vários modelos de previsão são extremamente simples e bastante
+efetivos, em que, diversas vezes são utilizados como <em>benchmark</em>
+para comparação com outros modelos de previsões.</p>
+<p>O método SNAIVE (<em>seasonal naive</em>, ou, em português, método
+sazonal ingênuo) define cada previsão para ser igual ao último valor
+observado da mesma estação, por exemplo, o mesmo mês do ano anterior,
+sendo definido matematicamente por:</p>
+<p><span class="math display">\[ y_{y} = y_{t-m} + z_{t}  \]</span> em
+que, <span class="math inline">\(z_{t}\)</span> é um termo de erro
+normal iid e o subscrito <span class="math inline">\(m\)</span>
+representa o período de sazonalidade considerado. Assim:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_snaive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/naive.html'>snaive</a></span><span class='op'>(</span><span class='va'>treino_ts</span><span class='op'>)</span>
+
+<span class='va'>prev_snaive</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
+</div>
+<h1 id="ets">ETS</h1>
+<p>Os modelos ETS, métodos de suavização exponencial, são uma família de
+modelos de séries temporais que consistem em um componente de nível, um
+componente de tendência, um componente sazonal e um termo de erro. Cada
+modelo consiste em uma equação de medição que descreve os dados
+observados e algumas equações de estado que descrevem como os
+componentes ou estados não observados (nível, estado, sazonalidade)
+mudam ao longo do tempo, sendo conhecido como modelos de espaço de
+estados (<em>state space model</em>).</p>
+<p>As previsões produzidas por métodos de suavização exponencial são
+médias ponderadas de observações anteriores, com os pesos decaindo
+exponencialmente à medida que as observações envelhecem, ou seja, quanto
+mais recente a observação, maior o peso associado. Critérios de
+informação como o AIC, AICc e o BIC são utilizados para determinar qual
+dos modelos ETS é mais apropriado para uma determinada variável.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modelo_ets</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/ets.html'>ets</a></span><span class='op'>(</span><span class='va'>treino_ts</span>, additive.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>
+
+<span class='va'>modelo_ets</span>
+</code></pre>
+</div>
+<pre><code>ETS(A,A,A) 
+
+Call:
+ ets(y = treino_ts, additive.only = T) 
+
+  Smoothing parameters:
+    alpha = 0.2333 
+    beta  = 0.0026 
+    gamma = 0.5065 
+
+  Initial states:
+    l = -503.2402 
+    b = 260.7 
+    s = 7256.51 -822.5345 3899.512 -3343.411 -3150.758 796.2271
+           -2243.694 -3893.926 2895.186 -3108.885 -5968.506 7684.279
+
+  sigma:  4650.172
+
+     AIC     AICc      BIC 
+6653.980 6656.198 6716.601 </code></pre>
+</div>
+<p>O modelo mais apropriado para a variável arrecadação foi o
+ETS(A,A,A), que representa o método de Holt-Winter com erros aditivos,
+(para mais classificações, ver <a
+href="https://otexts.com/fpp3/ets.html">Forecasting: Principles and
+Practice</a>. O método de Holt-Winter com erros aditivos é representado
+matematicamente a seguir:</p>
+<p><span class="math display">\[ y_{t} = l_{t-1} + b_{t-1} + s_{t-m} +
+\epsilon_{t} \]</span> <span class="math display">\[ l_{t} = l_{t-1} +
+b_{t-1} + \alpha\epsilon_{t} \]</span> <span class="math display">\[
+b_{t} = b_{t-1} + \beta\epsilon_{t} \]</span> <span
+class="math display">\[ s_{t} = s_{t-m} + \gamma\epsilon_{t}
+\]</span></p>
+<p>em que, <span class="math inline">\(l_{t}\)</span> é o componente de
+nível, <span class="math inline">\(b_{t}\)</span> representa a tendência
+e <span class="math inline">\(s_{t}\)</span> é o componente sazonal. A
+previsão desse modelo é dada por:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_ets</span> <span class='op'>&lt;-</span> <span class='va'>modelo_ets</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/forecast.html'>forecast</a></span><span class='op'>(</span>h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>prev_ets</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
+</div>
+<h1 id="arima">ARIMA</h1>
+<p>Uma metodologia bastante utilizada na análise de séries temporais é
+conhecida como abordagem de Box e Jenkins, que consiste em ajustar
+modelo ARIMA a um conjunto de dados usando como estratégia para
+construção do modelo um ciclo iterativo, no qual a escolha da estrutura
+do modelo é baseada nos próprios dados. O modelo ARIMA pode ser descrito
+matematicamente como:</p>
+<p><span class="math display">\[ Y_{t} = c + \alpha_{1} Y_{t-1} + ... +
+\alpha_{p} Y_{t-p} + \epsilon_{t} + \theta_{1} \epsilon_{t-1} + ... +
+\theta_{q} \epsilon_{t-q} \]</span></p>
+<p>em que, <span class="math inline">\(\alpha_{i}\)</span> são os
+parâmetros da parte auto-regressiva do modelo, <span
+class="math inline">\(\theta_{i}\)</span> são os parâmetros da parte de
+média móvel e <span class="math inline">\(\epsilon\)</span> são os
+termos de erro. Modelos ARIMA são capazes também de modelar séries que
+apresentam um componente sazonal, sendo descrito como: <span
+class="math inline">\(ARIMA (p,d,q)(P,D,Q)_{m}\)</span>, em que o
+primeiro parênteses se refere à parte não sazonal do modelo e o segundo,
+à parte sazonal, com <span class="math inline">\(m\)</span>
+correspondendo ao número de períodos sazonais. Para a série tmeporal de
+Arrecadação Federal, temos:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modelo_arima</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/auto.arima.html'>auto.arima</a></span><span class='op'>(</span><span class='va'>treino_ts</span>, stepwise <span class='op'>=</span> <span class='cn'>F</span>,
+                           allowdrift <span class='op'>=</span> <span class='cn'>T</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+
+<span class='va'>modelo_arima</span>
+</code></pre>
+</div>
+<pre><code>Series: treino_ts 
+ARIMA(0,1,4)(0,1,1)[12] 
+
+Coefficients:
+          ma1      ma2     ma3      ma4     sma1
+      -0.6420  -0.1418  0.1064  -0.1180  -0.4771
+s.e.   0.0599   0.0689  0.0667   0.0585   0.0579
+
+sigma^2 = 20026531:  log likelihood = -2760.43
+AIC=5532.86   AICc=5533.17   BIC=5554.69</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_arima</span> <span class='op'>&lt;-</span> <span class='va'>modelo_arima</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/forecast.html'>forecast</a></span><span class='op'>(</span>h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>prev_arima</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-7-1.png" width="624" /></p>
+</div>
+<h1 id="tbats">TBATS</h1>
+<p>O TBATS usa uma combinação de termos de Fourier com um modelo de
+espaço de estados (<em>state space model</em>) de suavização exponencial
+e uma transformação Box-Cox, de forma automatizada.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modelo_tbats</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/tbats.html'>tbats</a></span><span class='op'>(</span><span class='va'>treino_ts</span><span class='op'>)</span>
+
+<span class='va'>modelo_tbats</span>
+</code></pre>
+</div>
+<pre><code>TBATS(0.404, {5,1}, 0.978, {&lt;12,5&gt;})
+
+Call: tbats(y = treino_ts)
+
+Parameters
+  Lambda: 0.403682
+  Alpha: 1.057625
+  Beta: 0.0632135
+  Damping Parameter: 0.978165
+  Gamma-1 Values: 0.001127559
+  Gamma-2 Values: 0.0009261788
+  AR coefficients: -0.928473 -0.672951 -0.369444 -0.343473 -0.415237
+  MA coefficients: 0.439634
+
+Seed States:
+             [,1]
+ [1,] -12.6632706
+ [2,]   0.3005753
+ [3,]   2.7125562
+ [4,]   1.2970781
+ [5,]   0.7702674
+ [6,]   5.1179036
+ [7,]   0.6989105
+ [8,]  -1.9641471
+ [9,]  -2.5664798
+[10,]  -2.9835088
+[11,]  -2.5669873
+[12,]  -1.1876519
+[13,]   0.0000000
+[14,]   0.0000000
+[15,]   0.0000000
+[16,]   0.0000000
+[17,]   0.0000000
+[18,]   0.0000000
+attr(,&quot;lambda&quot;)
+[1] 0.4036825
+
+Sigma: 7.147068
+AIC: 6423.933</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_tbats</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/forecast.html'>forecast</a></span><span class='op'>(</span><span class='va'>modelo_tbats</span>, h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>prev_tbats</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
+</div>
+<h1 id="modelo-híbrido---ensemble-model">Modelo híbrido - (<em>ensemble
+model</em>)</h1>
+<p>O primeiro método observado das combinações de modelos irá utilizar
+pesos iguais para cada um dos modelos considerados que, segundo os
+criadores do pacocte, é o que tem se mostrado robusto e melhor em muitos
+casos quando comparado ao método de se dar maior peso a modelos com
+melhor desempenhos dentro da amostra.Assim:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modelo_hibrido_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/forecastHybrid/man/hybridModel.html'>hybridModel</a></span><span class='op'>(</span>
+  <span class='va'>treino_ts</span>, 
+  <span class='co'># a == auto.arima, e == ets, t == tbats, z == snaive</span>
+  models <span class='op'>=</span> <span class='st'>'aetz'</span>,
+  <span class='co'># argumentos para garantir que seja igual ao modelo obtido individualmente</span>
+  e.args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>additive.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>, 
+  a.args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stepwise <span class='op'>=</span> <span class='cn'>F</span>, allowdrift <span class='op'>=</span> <span class='cn'>T</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>,
+  <span class='co'># peso de cada um dos modelos nas previsões</span>
+  weights <span class='op'>=</span> <span class='st'>'equal'</span>
+  <span class='op'>)</span>
+
+<span class='va'>modelo_hibrido_1</span>
+</code></pre>
+</div>
+<pre><code>Hybrid forecast model comprised of the following models: auto.arima, ets, tbats, snaive
+############
+auto.arima with weight 0.25 
+############
+ets with weight 0.25 
+############
+tbats with weight 0.25 
+############
+snaive with weight 0.25 </code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_hibrido_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/forecast.html'>forecast</a></span><span class='op'>(</span><span class='va'>modelo_hibrido_1</span>, h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>prev_hibrido_1</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Modelo híbrido com pesos iguais'</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
+</div>
+<p>O segundo modelo híbrido considerado irá utilizar o método de erros
+de validação cruzada (<em>cross validation</em>), que devem produzir as
+melhores previsões, porém, com um custo computacional mais elevado na
+hora da estimação do modelo.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modelo_hibrido_2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/forecastHybrid/man/hybridModel.html'>hybridModel</a></span><span class='op'>(</span>
+  <span class='va'>treino_ts</span>, 
+  models <span class='op'>=</span> <span class='st'>'aetz'</span>,
+  e.args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>additive.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>,
+  a.args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stepwise <span class='op'>=</span> <span class='cn'>F</span>, allowdrift <span class='op'>=</span> <span class='cn'>T</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>,
+  weights <span class='op'>=</span> <span class='st'>'cv.errors'</span>,
+  <span class='co'># funções usadas quando weights = cv.errors</span>
+  cvHorizon <span class='op'>=</span> <span class='fl'>6</span>,
+  <span class='op'>)</span>
+
+<span class='va'>modelo_hibrido_2</span>
+</code></pre>
+</div>
+<pre><code>Hybrid forecast model comprised of the following models: auto.arima, ets, tbats, snaive
+############
+auto.arima with weight 0.415 
+############
+ets with weight 0.104 
+############
+tbats with weight 0.198 
+############
+snaive with weight 0.283 </code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_hibrido_2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/forecast.html'>forecast</a></span><span class='op'>(</span><span class='va'>modelo_hibrido_2</span>, h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>prev_hibrido_2</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Modelo híbrido com pesos estimados por validação cruzada'</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-13-1.png" width="624" /></p>
+</div>
+<h1 id="comparação-de-modelos">Comparação de modelos</h1>
+<p>Graficamente, todos os modelos estimados podem ser observados a
+seguir:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_snaive</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'SNAIVE'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_ets</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'ETS'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_arima</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'SARIMA'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_tbats</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'TBATS'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_hibrido_1</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'Híbrido1'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autolayer.html'>autolayer</a></span><span class='op'>(</span><span class='va'>prev_hibrido_2</span><span class='op'>$</span><span class='va'>mean</span>, series <span class='op'>=</span> <span class='st'>'Híbrido2'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Amostra de teste + previsões'</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>'bottom'</span>,
+        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="series-temporais_files/figure-html5/unnamed-chunk-14-1.png" width="624" /></p>
+</div>
+<p>Outra forma de avaliar os modelos estudados é através das medidas de
+acurácia, que podem utilizar diferentes métricas, deste modo:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>acuracia</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span>
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_snaive</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_ets</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_arima</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_tbats</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_hibrido_1</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span><span class='va'>teste_ts</span>, <span class='va'>prev_hibrido_2</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>
+  <span class='op'>)</span>,
+  row.names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'Snaive'</span>, <span class='st'>'ets'</span>, <span class='st'>'Sarima'</span>, <span class='st'>'tbats'</span>, <span class='st'>'hibrido1'</span>, <span class='st'>'hibrido2'</span><span class='op'>)</span>
+  <span class='op'>)</span>
+
+<span class='va'>acuracia</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ME</th>
+<th style="text-align: right;">RMSE</th>
+<th style="text-align: right;">MAE</th>
+<th style="text-align: right;">MPE</th>
+<th style="text-align: right;">MAPE</th>
+<th style="text-align: right;">ACF1</th>
+<th style="text-align: right;">Theil.s.U</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Snaive</td>
+<td style="text-align: right;">-11116.042</td>
+<td style="text-align: right;">15953.456</td>
+<td style="text-align: right;">14830.829</td>
+<td style="text-align: right;">-11.017866</td>
+<td style="text-align: right;">13.514349</td>
+<td style="text-align: right;">-0.0180539</td>
+<td style="text-align: right;">0.6120788</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ets</td>
+<td style="text-align: right;">-4637.242</td>
+<td style="text-align: right;">8657.265</td>
+<td style="text-align: right;">7284.705</td>
+<td style="text-align: right;">-4.058810</td>
+<td style="text-align: right;">5.973454</td>
+<td style="text-align: right;">0.0374870</td>
+<td style="text-align: right;">0.4151768</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sarima</td>
+<td style="text-align: right;">-4554.419</td>
+<td style="text-align: right;">8255.262</td>
+<td style="text-align: right;">7000.234</td>
+<td style="text-align: right;">-3.962582</td>
+<td style="text-align: right;">5.749364</td>
+<td style="text-align: right;">0.0605719</td>
+<td style="text-align: right;">0.4118826</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tbats</td>
+<td style="text-align: right;">-13571.459</td>
+<td style="text-align: right;">17010.999</td>
+<td style="text-align: right;">13992.936</td>
+<td style="text-align: right;">-12.096571</td>
+<td style="text-align: right;">12.459068</td>
+<td style="text-align: right;">0.2073856</td>
+<td style="text-align: right;">1.7004000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">hibrido1</td>
+<td style="text-align: right;">-8803.678</td>
+<td style="text-align: right;">11863.537</td>
+<td style="text-align: right;">10381.832</td>
+<td style="text-align: right;">-7.796458</td>
+<td style="text-align: right;">8.987366</td>
+<td style="text-align: right;">0.1273731</td>
+<td style="text-align: right;">0.6065432</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hibrido2</td>
+<td style="text-align: right;">-8579.808</td>
+<td style="text-align: right;">11769.092</td>
+<td style="text-align: right;">10427.972</td>
+<td style="text-align: right;">-7.646188</td>
+<td style="text-align: right;">9.018947</td>
+<td style="text-align: right;">0.1079053</td>
+<td style="text-align: right;">0.5825703</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Para os modelos analisados, identifica-se através do Erro Percentual
+Absoluto Médio - MAPE, que a combinação de modelos proporciona previsões
+melhores do que o modelo <em>benchmark</em> SNAIVE e do que o modelo
+TBATS, entretanto, os modelos SARIMA e ETS obtêm previsões mais
+próximas, na média, dos verdadeiros resultados observados.</p>
+<p>Desta análise inicial, temos que, para a <strong>Arrecadação
+Federal</strong>, com a combinação de modelos de séries temporais
+podemos obter previsões com maior acurácia do que determinados métodos,
+entretanto, os modelos Arima e ETS proporcionaram menores métricas de
+acurácia. Como passo seguinte a esta análise, pode-se verificar a melhor
+seleção de modelos para combinação, bem como, a utilização de outros
+modelos não existentes no pacote <strong>forecastHybrid</strong>,
+demandando um trabalho um pouco maior na parte de programação.</p>
+<div class="sourceCode" id="cb6"><pre
 class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
@@ -2175,6 +2611,15 @@ class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"><
 <div class="d-appendix">
 </div>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->

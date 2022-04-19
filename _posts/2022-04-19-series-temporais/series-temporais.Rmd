@@ -1,10 +1,10 @@
 ---
-title: "series temporais"
+title: "Combinação de modelos de séries temporais - Previsão da Arrecadação Federal"
 categories:
   - series temporais
   - finanças públicas
 description: |
-  Nesse post é analisado como se comporta a combinação de modelos de séries temporais na previsão da série de tempo Arrecadação Federal. Neste estudo é visto que a simples ponderação de igualitária entre os modelos pode melhorar as previsões quando comparada com o modelo benchmark.
+  Nesse post é analisado como se comporta a combinação de modelos de séries temporais na previsão da série de tempo Arrecadação Federal. Neste estudo é visto que a simples ponderação entre os modelos pode melhorar as previsões quando comparada com o modelo benchmark.
 author:
   - name: Breno Pereira
     url: https://www.linkedin.com/in/brenosapereira/

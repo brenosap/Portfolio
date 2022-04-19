@@ -1,5 +1,25 @@
 [
   {
+    "path": "posts/2022-04-19-series-temporais/",
+    "title": "series temporais",
+    "description": "Nesse post é analisado como se comporta a combinação de modelos de séries temporais na previsão da série de tempo Arrecadação Federal. Neste estudo é visto que a simples ponderação de igualitária entre os modelos pode melhorar as previsões quando comparada com o modelo benchmark.",
+    "author": [
+      {
+        "name": "Breno Pereira",
+        "url": "https://www.linkedin.com/in/brenosapereira/"
+      }
+    ],
+    "date": "2022-04-19",
+    "categories": [
+      "series temporais",
+      "finanças públicas"
+    ],
+    "contents": "\r\nCombinação de\r\nprevisões de séries temporais\r\nNo âmbito das séries temporais, diversos modelos são propostos com o\r\nintuito de melhorar as previsões das variáveis, tanto para o curto\r\nprazo, como para o longo prazo . Cada um destes modelos aborda de forma\r\ndiferente os componentes das séris temporais, a saber:\r\nTendência: capta elementos de longo prazo relacionados com a\r\nsérie de tempo;\r\nSazonalidade: capta os padrões regulares da séries de\r\ntempo;\r\nCiclo: caracterizado por longas ondas, mais ou menos regulares,\r\nem torno de uma linha de tendência, o ciclo não possui intervalos fixos,\r\no que o diferencia da sazonalidade;\r\nResíduo: são flutuações inexplicáveis, captando todos os efeitos\r\nque não foram incorporados pela série de tempo nos componentes\r\nanteriores.\r\nNeste caminho, alguns estudos identificam que a combinação de\r\nprevisões (em inglês, ensenmble forecasting) podem apresentar\r\nresultados mais precisos do que as previsões dos modelos em separado.\r\nComo forma de estudar este teoria, neste post será abordado a combinação\r\nde modelos de previsões atráves do pacote do R forecastHybrid.\r\nA série de tempo utilizada será a Arrecadação federal, que é a soma\r\ndas receitas administradas pela Receita Federal com as receitas\r\nadministradas por outros órgãos, obtida através do pacote ipeadatar, uma\r\nalternativa para a utilização da base de dados do Instituto de Pesquisa\r\nEconômica Aplicada (IPEA).\r\n\r\n\r\nlibrary(dplyr)\r\nlibrary(ggplot2)\r\nlibrary(forecast)\r\nlibrary(ipeadatar)  # para baixar a série de arrecadação\r\nlibrary(forecastHybrid)  # pacote para\r\n\r\n# código da variável Arrecadação Federal == SRF12_TOTGER12\r\narrecadacao <- ipeadata(code = 'SRF12_TOTGER12', language = 'br') %>% \r\n  filter\r\n\r\n# transformando em série temporal\r\narrecadacao_ts <- arrecadacao %>% \r\n  filter(date < '2020-01-01') %>% \r\n  select(value) %>% \r\n  ts(., start = c(1993, 1), frequency = 12)\r\n\r\narrecadacao_ts %>% \r\n  autoplot()\r\n\r\n\r\n\r\n\r\nAmostras de treino e teste\r\n\r\n\r\n\r\n",
+    "preview": "posts/2022-04-19-series-temporais/series-temporais_files/figure-html5/unnamed-chunk-1-1.png",
+    "last_modified": "2022-04-19T17:09:32-03:00",
+    "input_file": "series-temporais.knit.md"
+  },
+  {
     "path": "posts/2022-04-08-spotify/",
     "title": "Análise dos gêneros musicais no Spotify",
     "description": "Post proposto em Workshop de Data Science na Prática do Curso-r.",

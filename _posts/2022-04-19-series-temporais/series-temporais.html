@@ -1534,12 +1534,13 @@ Econômica Aplicada (IPEA).</p>
 
 <span class='co'># transformando em série temporal</span>
 <span class='va'>arrecadacao_ts</span> <span class='op'>&lt;-</span> <span class='va'>arrecadacao</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>date</span> <span class='op'>&lt;</span> <span class='st'>'2020-01-01'</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>value</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span><span class='op'>(</span><span class='va'>.</span>, start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1993</span>, <span class='fl'>1</span><span class='op'>)</span>, frequency <span class='op'>=</span> <span class='fl'>12</span><span class='op'>)</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>date</span> <span class='op'>&gt;=</span> <span class='st'>'1995-01-01'</span> <span class='op'>&amp;</span> <span class='va'>date</span> <span class='op'>&lt;</span> <span class='st'>'2020-01-01'</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>value</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span><span class='op'>(</span><span class='va'>.</span>, start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1995</span>, <span class='fl'>1</span><span class='op'>)</span>, frequency <span class='op'>=</span> <span class='fl'>12</span><span class='op'>)</span>
 
 <span class='va'>arrecadacao_ts</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Log da Arrecadação Federal'</span><span class='op'>)</span>
 </code></pre>
 </div>
 <p><img src="series-temporais_files/figure-html5/unnamed-chunk-1-1.png" width="624" /></p>
@@ -1547,7 +1548,8 @@ Econômica Aplicada (IPEA).</p>
 <h2 id="amostras-de-treino-e-teste">Amostras de treino e teste</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>split</span> <span class='op'>&lt;-</span> <span class='fu'>TSstudio</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/TSstudio/man/ts_split.html'>ts_split</a></span><span class='op'>(</span>ts.obj <span class='op'>=</span> <span class='va'>arrecadacao_ts</span>, sample.out <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>split</span> <span class='op'>&lt;-</span> <span class='fu'>TSstudio</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/TSstudio/man/ts_split.html'>ts_split</a></span><span class='op'>(</span>ts.obj <span class='op'>=</span> <span class='va'>arrecadacao_ts</span>, 
+                            sample.out <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>0.3</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>arrecadacao_ts</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='va'>treino_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>train</span>
 <span class='va'>teste_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>test</span>
@@ -1568,7 +1570,7 @@ normal iid e o subscrito <span class="math inline">\(m\)</span>
 representa o período de sazonalidade considerado. Assim:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_snaive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/naive.html'>snaive</a></span><span class='op'>(</span><span class='va'>treino_ts</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prev_snaive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://pkg.robjhyndman.com/forecast/reference/naive.html'>snaive</a></span><span class='op'>(</span><span class='va'>treino_ts</span>, h <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>teste_ts</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='va'>prev_snaive</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span>
@@ -1604,20 +1606,20 @@ Call:
  ets(y = treino_ts, additive.only = T) 
 
   Smoothing parameters:
-    alpha = 0.2333 
-    beta  = 0.0026 
-    gamma = 0.5065 
+    alpha = 0.2952 
+    beta  = 0.0067 
+    gamma = 0.5016 
 
   Initial states:
-    l = -503.2402 
-    b = 260.7 
-    s = 7256.51 -822.5345 3899.512 -3343.411 -3150.758 796.2271
-           -2243.694 -3893.926 2895.186 -3108.885 -5968.506 7684.279
+    l = 7386.4181 
+    b = 45.5057 
+    s = 5209.667 -1120.995 2379.223 -1697.294 -1356.669 977.5651
+           -1092.118 -2800.731 2055.223 -1854.902 -4168.123 3469.155
 
-  sigma:  4650.172
+  sigma:  3618.903
 
      AIC     AICc      BIC 
-6653.980 6656.198 6716.601 </code></pre>
+4581.699 4584.887 4638.600 </code></pre>
 </div>
 <p>O modelo mais apropriado para a variável arrecadação foi o
 ETS(A,A,A), que representa o método de Holt-Winter com erros aditivos,
@@ -1676,15 +1678,15 @@ Arrecadação Federal, temos:</p>
 </code></pre>
 </div>
 <pre><code>Series: treino_ts 
-ARIMA(0,1,4)(0,1,1)[12] 
+ARIMA(0,1,2)(0,1,2)[12] 
 
 Coefficients:
-          ma1      ma2     ma3      ma4     sma1
-      -0.6420  -0.1418  0.1064  -0.1180  -0.4771
-s.e.   0.0599   0.0689  0.0667   0.0585   0.0579
+          ma1      ma2     sma1    sma2
+      -0.4179  -0.1996  -0.5208  0.1518
+s.e.   0.0751   0.0799   0.0765  0.0737
 
-sigma^2 = 20026531:  log likelihood = -2760.43
-AIC=5532.86   AICc=5533.17   BIC=5554.69</code></pre>
+sigma^2 = 10931741:  log likelihood = -1875.78
+AIC=3761.55   AICc=3761.87   BIC=3777.97</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -1708,45 +1710,44 @@ e uma transformação Box-Cox, de forma automatizada.</p>
 <span class='va'>modelo_tbats</span>
 </code></pre>
 </div>
-<pre><code>TBATS(0.404, {5,1}, 0.978, {&lt;12,5&gt;})
+<pre><code>TBATS(0.031, {2,3}, 1, {&lt;12,5&gt;})
 
 Call: tbats(y = treino_ts)
 
 Parameters
-  Lambda: 0.403682
-  Alpha: 1.057625
-  Beta: 0.0632135
-  Damping Parameter: 0.978165
-  Gamma-1 Values: 0.001127559
-  Gamma-2 Values: 0.0009261788
-  AR coefficients: -0.928473 -0.672951 -0.369444 -0.343473 -0.415237
-  MA coefficients: 0.439634
+  Lambda: 0.030521
+  Alpha: 0.1473987
+  Beta: -0.001558141
+  Damping Parameter: 1
+  Gamma-1 Values: -0.0001070832
+  Gamma-2 Values: -0.000377239
+  AR coefficients: -0.399081 -0.811978
+  MA coefficients: 0.548963 1.050777 0.200741
 
 Seed States:
-             [,1]
- [1,] -12.6632706
- [2,]   0.3005753
- [3,]   2.7125562
- [4,]   1.2970781
- [5,]   0.7702674
- [6,]   5.1179036
- [7,]   0.6989105
- [8,]  -1.9641471
- [9,]  -2.5664798
-[10,]  -2.9835088
-[11,]  -2.5669873
-[12,]  -1.1876519
-[13,]   0.0000000
-[14,]   0.0000000
-[15,]   0.0000000
-[16,]   0.0000000
-[17,]   0.0000000
-[18,]   0.0000000
+              [,1]
+ [1,] 10.173446526
+ [2,]  0.015661826
+ [3,]  0.038192074
+ [4,]  0.018831191
+ [5,]  0.002811171
+ [6,]  0.081369521
+ [7,]  0.007245023
+ [8,] -0.036741135
+ [9,] -0.027418199
+[10,] -0.074153945
+[11,] -0.060163298
+[12,] -0.037018617
+[13,]  0.000000000
+[14,]  0.000000000
+[15,]  0.000000000
+[16,]  0.000000000
+[17,]  0.000000000
 attr(,&quot;lambda&quot;)
-[1] 0.4036825
+[1] 0.03052124
 
-Sigma: 7.147068
-AIC: 6423.933</code></pre>
+Sigma: 0.1343246
+AIC: 4450.957</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -1823,13 +1824,13 @@ hora da estimação do modelo.</p>
 </div>
 <pre><code>Hybrid forecast model comprised of the following models: auto.arima, ets, tbats, snaive
 ############
-auto.arima with weight 0.415 
+auto.arima with weight 0.26 
 ############
-ets with weight 0.104 
+ets with weight 0.253 
 ############
-tbats with weight 0.198 
+tbats with weight 0.291 
 ############
-snaive with weight 0.283 </code></pre>
+snaive with weight 0.195 </code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -1883,13 +1884,13 @@ acurácia, que podem utilizar diferentes métricas, deste modo:</p>
 </div>
 <table>
 <colgroup>
-<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+<col style="width: 11%" />
 <col style="width: 13%" />
 <col style="width: 12%" />
 <col style="width: 12%" />
-<col style="width: 13%" />
-<col style="width: 12%" />
-<col style="width: 13%" />
 <col style="width: 12%" />
 </colgroup>
 <thead>
@@ -1907,80 +1908,81 @@ acurácia, que podem utilizar diferentes métricas, deste modo:</p>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Snaive</td>
-<td style="text-align: right;">-11116.042</td>
-<td style="text-align: right;">15953.456</td>
-<td style="text-align: right;">14830.829</td>
-<td style="text-align: right;">-11.017866</td>
-<td style="text-align: right;">13.514349</td>
-<td style="text-align: right;">-0.0180539</td>
-<td style="text-align: right;">0.6120788</td>
+<td style="text-align: right;">-23353.578</td>
+<td style="text-align: right;">27453.485</td>
+<td style="text-align: right;">23465.90</td>
+<td style="text-align: right;">-27.650644</td>
+<td style="text-align: right;">27.781597</td>
+<td style="text-align: right;">0.7512162</td>
+<td style="text-align: right;">2.1109997</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ets</td>
-<td style="text-align: right;">-4637.242</td>
-<td style="text-align: right;">8657.265</td>
-<td style="text-align: right;">7284.705</td>
-<td style="text-align: right;">-4.058810</td>
-<td style="text-align: right;">5.973454</td>
-<td style="text-align: right;">0.0374870</td>
-<td style="text-align: right;">0.4151768</td>
+<td style="text-align: right;">5156.744</td>
+<td style="text-align: right;">9249.662</td>
+<td style="text-align: right;">7735.78</td>
+<td style="text-align: right;">4.547105</td>
+<td style="text-align: right;">6.774738</td>
+<td style="text-align: right;">0.1741918</td>
+<td style="text-align: right;">0.7229727</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Sarima</td>
-<td style="text-align: right;">-4554.419</td>
-<td style="text-align: right;">8255.262</td>
-<td style="text-align: right;">7000.234</td>
-<td style="text-align: right;">-3.962582</td>
-<td style="text-align: right;">5.749364</td>
-<td style="text-align: right;">0.0605719</td>
-<td style="text-align: right;">0.4118826</td>
+<td style="text-align: right;">10645.687</td>
+<td style="text-align: right;">13974.020</td>
+<td style="text-align: right;">12131.62</td>
+<td style="text-align: right;">8.714859</td>
+<td style="text-align: right;">10.013343</td>
+<td style="text-align: right;">0.4395835</td>
+<td style="text-align: right;">1.0275873</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">tbats</td>
-<td style="text-align: right;">-13571.459</td>
-<td style="text-align: right;">17010.999</td>
-<td style="text-align: right;">13992.936</td>
-<td style="text-align: right;">-12.096571</td>
-<td style="text-align: right;">12.459068</td>
-<td style="text-align: right;">0.2073856</td>
-<td style="text-align: right;">1.7004000</td>
+<td style="text-align: right;">48909.153</td>
+<td style="text-align: right;">59964.993</td>
+<td style="text-align: right;">49328.16</td>
+<td style="text-align: right;">27.628661</td>
+<td style="text-align: right;">28.022644</td>
+<td style="text-align: right;">0.9026893</td>
+<td style="text-align: right;">2.9543830</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">hibrido1</td>
-<td style="text-align: right;">-8803.678</td>
-<td style="text-align: right;">11863.537</td>
-<td style="text-align: right;">10381.832</td>
-<td style="text-align: right;">-7.796458</td>
-<td style="text-align: right;">8.987366</td>
-<td style="text-align: right;">0.1273731</td>
-<td style="text-align: right;">0.6065432</td>
+<td style="text-align: right;">10339.501</td>
+<td style="text-align: right;">14535.031</td>
+<td style="text-align: right;">12129.45</td>
+<td style="text-align: right;">8.186082</td>
+<td style="text-align: right;">9.811860</td>
+<td style="text-align: right;">0.5496948</td>
+<td style="text-align: right;">0.9897453</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">hibrido2</td>
-<td style="text-align: right;">-8579.808</td>
-<td style="text-align: right;">11769.092</td>
-<td style="text-align: right;">10427.972</td>
-<td style="text-align: right;">-7.646188</td>
-<td style="text-align: right;">9.018947</td>
-<td style="text-align: right;">0.1079053</td>
-<td style="text-align: right;">0.5825703</td>
+<td style="text-align: right;">13765.233</td>
+<td style="text-align: right;">18159.918</td>
+<td style="text-align: right;">15185.84</td>
+<td style="text-align: right;">10.511402</td>
+<td style="text-align: right;">11.808062</td>
+<td style="text-align: right;">0.6519073</td>
+<td style="text-align: right;">1.1995753</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>Para os modelos analisados, identifica-se através do Erro Percentual
-Absoluto Médio - MAPE, que a combinação de modelos proporciona previsões
-melhores do que o modelo <em>benchmark</em> SNAIVE e do que o modelo
-TBATS, entretanto, os modelos SARIMA e ETS obtêm previsões mais
-próximas, na média, dos verdadeiros resultados observados.</p>
+Absoluto Médio - MAPE, que a combinação de modelos, quando são dados
+pesos iguais a todos os modelos, apresenta melhores previsões do que
+praticamente todos os modelos (principalmente quando comparado com o
+modelo <em>benchmark</em> e o TBATS). O método híbrido com pesos iguais
+para os modelos só apresenta menor acurácia do que o modelo de
+suavização exponencial.</p>
 <p>Desta análise inicial, temos que, para a <strong>Arrecadação
 Federal</strong>, com a combinação de modelos de séries temporais
-podemos obter previsões com maior acurácia do que determinados métodos,
-entretanto, os modelos Arima e ETS proporcionaram menores métricas de
-acurácia. Como passo seguinte a esta análise, pode-se verificar a melhor
-seleção de modelos para combinação, bem como, a utilização de outros
-modelos não existentes no pacote <strong>forecastHybrid</strong>,
-demandando um trabalho um pouco maior na parte de programação.</p>
+podemos obter previsões com maior acurácia do que determinados métodos.
+Como passo seguinte a esta análise, pode-se verificar a melhor seleção
+de modelos para combinação, bem como, a utilização de outros modelos não
+existentes no pacote <strong>forecastHybrid</strong>, demandando um
+trabalho um pouco maior na parte de programação.</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->

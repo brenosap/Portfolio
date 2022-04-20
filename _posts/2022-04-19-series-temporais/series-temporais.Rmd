@@ -53,19 +53,21 @@ arrecadacao <- ipeadata(code = 'SRF12_TOTGER12', language = 'br') %>%
 
 # transformando em série temporal
 arrecadacao_ts <- arrecadacao %>% 
-  filter(date < '2020-01-01') %>% 
-  select(value) %>% 
-  ts(., start = c(1993, 1), frequency = 12)
+  filter(date >= '1995-01-01' & date < '2020-01-01') %>% 
+  select(value) %>%
+  ts(., start = c(1995, 1), frequency = 12)
 
 arrecadacao_ts %>% 
-  autoplot()
+  autoplot()+
+  ggtitle('Log da Arrecadação Federal')
 ```
 
 ## Amostras de treino e teste
 
 ```{r}
 
-split <- TSstudio::ts_split(ts.obj = arrecadacao_ts, sample.out = 30)
+split <- TSstudio::ts_split(ts.obj = arrecadacao_ts, 
+                            sample.out = round(0.3*length(arrecadacao_ts)))
 
 treino_ts <- split$train
 teste_ts <- split$test
@@ -81,7 +83,7 @@ $$ y_{y} = y_{t-m} + z_{t}  $$
 em que, $z_{t}$ é um termo de erro normal iid e o subscrito $m$ representa o período de sazonalidade considerado. Assim:
 
 ```{r}
-prev_snaive <- snaive(treino_ts)
+prev_snaive <- snaive(treino_ts, h = length(teste_ts))
 
 prev_snaive %>% 
   autoplot()
@@ -249,6 +251,6 @@ acuracia %>%
   knitr::kable()
 ```
 
-Para os modelos analisados, identifica-se através do Erro Percentual Absoluto Médio - MAPE, que a combinação de modelos proporciona previsões melhores do que o modelo *benchmark* SNAIVE e do que o modelo TBATS, entretanto, os modelos SARIMA e ETS obtêm previsões mais próximas, na média, dos verdadeiros resultados observados.
+Para os modelos analisados, identifica-se através do Erro Percentual Absoluto Médio - MAPE, que a combinação de modelos, quando são dados pesos iguais a todos os modelos, apresenta melhores previsões do que praticamente todos os modelos (principalmente quando comparado com o modelo *benchmark* e o TBATS). O método híbrido com pesos iguais para os modelos só apresenta menor acurácia do que o modelo de suavização exponencial.
 
-Desta análise inicial, temos que, para a **Arrecadação Federal**, com a combinação de modelos de séries temporais podemos obter previsões com maior acurácia do que determinados métodos, entretanto, os modelos Arima e ETS proporcionaram menores métricas de acurácia. Como passo seguinte a esta análise, pode-se verificar a melhor seleção de modelos para combinação, bem como, a utilização de outros modelos não existentes no pacote **forecastHybrid**, demandando um trabalho um pouco maior na parte de programação.
+Desta análise inicial, temos que, para a **Arrecadação Federal**, com a combinação de modelos de séries temporais podemos obter previsões com maior acurácia do que determinados métodos. Como passo seguinte a esta análise, pode-se verificar a melhor seleção de modelos para combinação, bem como, a utilização de outros modelos não existentes no pacote **forecastHybrid**, demandando um trabalho um pouco maior na parte de programação.

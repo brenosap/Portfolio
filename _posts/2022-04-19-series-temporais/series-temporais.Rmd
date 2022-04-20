@@ -125,7 +125,7 @@ Uma metodologia bastante utilizada na análise de séries temporais é conhecida
 
 $$ Y_{t} = c + \alpha_{1} Y_{t-1} + ... + \alpha_{p} Y_{t-p} + \epsilon_{t} + \theta_{1} \epsilon_{t-1} + ... + \theta_{q} \epsilon_{t-q} $$
 
-em que, $\alpha_{i}$ são os parâmetros da parte auto-regressiva do modelo, $\theta_{i}$ são os parâmetros da parte de média móvel e $\epsilon$ são os termos de erro. Modelos ARIMA são capazes também de modelar séries que apresentam um componente sazonal, sendo descrito como: $ARIMA (p,d,q)(P,D,Q)_{m}$, em que o primeiro parênteses se refere à parte não sazonal do modelo e o segundo, à parte sazonal, com $m$ correspondendo ao número de períodos sazonais. Para a série tmeporal de Arrecadação Federal, temos:
+em que, $\alpha_{i}$ são os parâmetros da parte auto-regressiva do modelo, $\theta_{i}$ são os parâmetros da parte de média móvel e $\epsilon$ são os termos de erro. Modelos ARIMA são capazes também de modelar séries que apresentam um componente sazonal, sendo descrito como: $ARIMA (p,d,q)(P,D,Q)_{m}$, em que o primeiro parênteses se refere à parte não sazonal do modelo e o segundo, à parte sazonal, com $m$ correspondendo ao número de períodos sazonais. Para a série temporal de Arrecadação Federal, temos:
 
 ```{r}
 

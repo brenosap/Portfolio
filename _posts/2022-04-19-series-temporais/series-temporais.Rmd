@@ -35,7 +35,7 @@ No âmbito das séries temporais, diversos modelos são propostos com o intuito 
 
 -   Resíduo: são flutuações inexplicáveis, captando todos os efeitos que não foram incorporados pela série de tempo nos componentes anteriores.
 
-Neste caminho, alguns estudos identificam que a combinação de previsões (em inglês, *ensenmble forecasting*) podem apresentar resultados mais precisos do que as previsões dos modelos em separado. Como forma de estudar este teoria, neste post será abordado a combinação de modelos de previsões atráves do pacote do **R**, [forecastHybrid](https://github.com/ellisp/forecastHybrid).
+Neste caminho, alguns estudos identificam que a combinação de previsões (em inglês, *ensenmble forecasting*) podem apresentar resultados mais precisos do que as previsões dos modelos em separado. Como forma de estudar este teoria, neste post será abordado a combinação de modelos de previsões atráves do pacote do **R**, [`forecastHybrid`](https://github.com/ellisp/forecastHybrid).
 
 A série de tempo utilizada será a Arrecadação federal, que é a soma das receitas administradas pela Receita Federal com as receitas administradas por outros órgãos, obtida através do pacote [ipeadatar](https://github.com/gomesleduardo/ipeadatar), uma alternativa para a utilização da base de dados do Instituto de Pesquisa Econômica Aplicada (IPEA).
 
@@ -48,8 +48,7 @@ library(ipeadatar)  # para baixar a série de arrecadação
 library(forecastHybrid)  # pacote para
 
 # código da variável Arrecadação Federal == SRF12_TOTGER12
-arrecadacao <- ipeadata(code = 'SRF12_TOTGER12', language = 'br') %>% 
-  filter
+arrecadacao <- ipeadata(code = 'SRF12_TOTGER12', language = 'br')
 
 # transformando em série temporal
 arrecadacao_ts <- arrecadacao %>% 

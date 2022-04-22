@@ -1513,7 +1513,7 @@ previsões (em inglês, <em>ensenmble forecasting</em>) podem apresentar
 resultados mais precisos do que as previsões dos modelos em separado.
 Como forma de estudar este teoria, neste post será abordado a combinação
 de modelos de previsões atráves do pacote do <strong>R</strong>, <a
-href="https://github.com/ellisp/forecastHybrid">forecastHybrid</a>.</p>
+href="https://github.com/ellisp/forecastHybrid"><code>forecastHybrid</code></a>.</p>
 <p>A série de tempo utilizada será a Arrecadação federal, que é a soma
 das receitas administradas pela Receita Federal com as receitas
 administradas por outros órgãos, obtida através do pacote <a
@@ -1529,8 +1529,7 @@ Econômica Aplicada (IPEA).</p>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://gitlab.com/dashaub/forecastHybrid'>forecastHybrid</a></span><span class='op'>)</span>  <span class='co'># pacote para</span>
 
 <span class='co'># código da variável Arrecadação Federal == SRF12_TOTGER12</span>
-<span class='va'>arrecadacao</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ipeadatar/man/ipeadata.html'>ipeadata</a></span><span class='op'>(</span>code <span class='op'>=</span> <span class='st'>'SRF12_TOTGER12'</span>, language <span class='op'>=</span> <span class='st'>'br'</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='va'>filter</span>
+<span class='va'>arrecadacao</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ipeadatar/man/ipeadata.html'>ipeadata</a></span><span class='op'>(</span>code <span class='op'>=</span> <span class='st'>'SRF12_TOTGER12'</span>, language <span class='op'>=</span> <span class='st'>'br'</span><span class='op'>)</span>
 
 <span class='co'># transformando em série temporal</span>
 <span class='va'>arrecadacao_ts</span> <span class='op'>&lt;-</span> <span class='va'>arrecadacao</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 

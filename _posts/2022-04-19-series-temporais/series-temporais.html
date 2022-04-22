@@ -1540,7 +1540,7 @@ Econômica Aplicada (IPEA).</p>
 
 <span class='va'>arrecadacao_ts</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Log da Arrecadação Federal'</span><span class='op'>)</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggtitle</a></span><span class='op'>(</span><span class='st'>'Arrecadação Federal'</span><span class='op'>)</span>
 </code></pre>
 </div>
 <p><img src="series-temporais_files/figure-html5/unnamed-chunk-1-1.png" width="624" /></p>
@@ -1548,8 +1548,9 @@ Econômica Aplicada (IPEA).</p>
 <h2 id="amostras-de-treino-e-teste">Amostras de treino e teste</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>split</span> <span class='op'>&lt;-</span> <span class='fu'>TSstudio</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/TSstudio/man/ts_split.html'>ts_split</a></span><span class='op'>(</span>ts.obj <span class='op'>=</span> <span class='va'>arrecadacao_ts</span>, 
-                            sample.out <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>0.3</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>arrecadacao_ts</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>teste_size</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>0.3</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>arrecadacao_ts</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>split</span> <span class='op'>&lt;-</span> <span class='fu'>TSstudio</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/TSstudio/man/ts_split.html'>ts_split</a></span><span class='op'>(</span>ts.obj <span class='op'>=</span> <span class='va'>arrecadacao_ts</span>, 
+                            sample.out <span class='op'>=</span> <span class='va'>teste_size</span><span class='op'>)</span>
 
 <span class='va'>treino_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>train</span>
 <span class='va'>teste_ts</span> <span class='op'>&lt;-</span> <span class='va'>split</span><span class='op'>$</span><span class='va'>test</span>

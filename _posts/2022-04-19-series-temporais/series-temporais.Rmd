@@ -59,15 +59,16 @@ arrecadacao_ts <- arrecadacao %>%
 
 arrecadacao_ts %>% 
   autoplot()+
-  ggtitle('Log da Arrecadação Federal')
+  ggtitle('Arrecadação Federal')
 ```
 
 ## Amostras de treino e teste
 
 ```{r}
 
+teste_size <- round(0.3*length(arrecadacao_ts))
 split <- TSstudio::ts_split(ts.obj = arrecadacao_ts, 
-                            sample.out = round(0.3*length(arrecadacao_ts)))
+                            sample.out = teste_size)
 
 treino_ts <- split$train
 teste_ts <- split$test
